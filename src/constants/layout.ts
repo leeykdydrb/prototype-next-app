@@ -1,0 +1,6 @@
+export const LAYOUT_CONSTANTS = {
+  DRAWER_WIDTH: 240,
+  DRAWER_WIDTH_COLLAPSED: 64,
+  HEADER_HEIGHT: 64,
+  BREAKPOINT: 'md',
+} as const

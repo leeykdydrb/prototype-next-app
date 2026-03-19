@@ -1,0 +1,142 @@
+services:
+  # Next.js Application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+        # 빌드 시점에 NEXT_PUBLIC_* 환경변수 전달 (클라이언트 번들에 포함됨)
+        NEXT_PUBLIC_KEYCLOAK_ISSUER: http://localhost:8082/realms/nextcube
+        NEXT_PUBLIC_KEYCLOAK_CLIENT_ID: nextjs-app
+    image: prototype-next-app
+    container_name: prototype-next-app-web
+    # ports:
+    #   - "3000:3000"
+    env_file:
+      - .env.production
+    networks:
+      - prototype-network
+      - mq-network
+      - keycloak-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    #   - redis
+    restart: unless-stopped
+    labels:
+      # Traefik labels
+      - "traefik.enable=true"
+      - "traefik.http.routers.web.rule=Host(`localhost`) || Host(`prototype-next-app.local`)"
+      - "traefik.http.routers.web.entrypoints=web"
+      - "traefik.http.services.web.loadbalancer.server.port=3000"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+
+  # ✅ One-off migration service (배포 시 1회 실행)
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: migrator
+      args:
+        DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+    image: prototype-next-app-migrator
+    pull_policy: never
+    env_file:
+      - .env.production
+    networks:
+      - prototype-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["migrate"]
+    restart: "no"
+
+  # ✅ One-off seed service (배포 시 1회 실행 초기 데이터 삽입)
+  seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: seeder
+    image: prototype-next-app-seeder
+    pull_policy: never
+    env_file:
+      - .env.production
+    networks:
+      - prototype-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles: ["seed"]
+    restart: "no"
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:17-alpine
+    container_name: prototype-next-app-postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.production
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - prototype-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 2s
+      retries: 20
+
+  # Traefik Reverse Proxy
+  traefik:
+    image: traefik:v3.6
+    container_name: prototype-next-app-traefik
+    command:
+      # API 및 대시보드 활성화
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      # Docker provider 활성화
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      # Entrypoints 설정
+      - "--entrypoints.web.address=:80"
+      # 로그 설정
+      - "--log.level=INFO"
+      - "--accesslog=true"
+    ports:
+      - "80:80"
+      - "8080:8080"  # Traefik 대시보드
+      # HTTPS를 사용하려면 아래 주석 해제
+      # - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # SSL 인증서를 사용하려면 아래 주석 해제
+      # - ./traefik/acme.json:/acme.json:ro
+    networks:
+      - prototype-network
+      - mq-network
+      - keycloak-network
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  prototype-network:
+    driver: bridge
+  mq-network:
+    external: true
+    name: prototype-mq_mq-network
+  keycloak-network:
+    external: true
+    name: prototype-keycloak_keycloak-network
