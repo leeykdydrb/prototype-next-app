@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/framework/form";
 import { Card, CardContent, CardHeader } from "@/components/framework/layout";
 import { Badge, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/framework/data-display";
@@ -25,7 +26,7 @@ import {
 import type { PermissionData, PermissionListProps } from "@/types/permission";
 import TablePagination from "@/components/common/TablePagination";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import { createPermissionColumns, columnHeaders } from "./table/columns";
+import { createPermissionColumns, type PermissionColumnId } from "./table/columns";
 
 const PermissionList = React.memo(function PermissionList({
   permissions,
@@ -38,6 +39,22 @@ const PermissionList = React.memo(function PermissionList({
   onRowsPerPageChange,
   totalCount,
 }: PermissionListProps) {
+  const tList = useTranslations("AdminPermissions.list");
+  const tCols = useTranslations("AdminPermissions.list.columns");
+
+  const labels = useMemo(
+    () =>
+      ({
+        name: tCols("name"),
+        displayName: tCols("displayName"),
+        description: tCols("description"),
+        isSystem: tCols("isSystem"),
+        isActive: tCols("isActive"),
+        actions: tCols("actions"),
+      }) satisfies Record<PermissionColumnId, string>,
+    [tCols],
+  );
+
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
@@ -133,8 +150,14 @@ const PermissionList = React.memo(function PermissionList({
 
   // 컬럼 정의
   const columns = useMemo(() => (
-    createPermissionColumns({ onEdit, onToggle, onDeleteClick: handleDeleteClick })
-  ), [onEdit, onToggle, handleDeleteClick]);
+    createPermissionColumns({
+      onEdit,
+      onToggle,
+      onDeleteClick: handleDeleteClick,
+      labels,
+      systemBadge: tList("systemBadge"),
+    })
+  ), [onEdit, onToggle, handleDeleteClick, labels, tList]);
 
   // tanstack/react-table 설정
   const table = useReactTable({
@@ -168,14 +191,14 @@ const PermissionList = React.memo(function PermissionList({
   return (
     <>
       <Card className="py-4">
-        <CardHeader className="px-4" title="권한 목록">
+        <CardHeader className="px-4" title={tList("cardTitle")}>
           <div className="flex items-center gap-2">
             <DropdownMenuComponents.Root>
               <DropdownMenuComponents.Trigger asChild>
                 <Button variant="outline" size="sm">
                   <ColumnsIcon className="h-4 w-4" />
-                  <span className="hidden lg:inline">컬럼 설정</span>
-                  <span className="lg:hidden">컬럼</span>
+                  <span className="hidden lg:inline">{tList("columnSettings")}</span>
+                  <span className="lg:hidden">{tList("columnSettingsShort")}</span>
                   <ChevronDownIcon className="h-4 w-4" />
                 </Button>
               </DropdownMenuComponents.Trigger>
@@ -193,7 +216,7 @@ const PermissionList = React.memo(function PermissionList({
                           column.toggleVisibility(!!value)
                         }
                       >
-                        {columnHeaders[column.id] || column.id}
+                        {(labels as Record<string, string>)[column.id] || column.id}
                       </DropdownMenuComponents.CheckboxItem>
                     );
                   })}
@@ -204,7 +227,7 @@ const PermissionList = React.memo(function PermissionList({
               size="sm"
               onClick={toggleAllGroups}
             >
-              {expandedGroups.size === sortedCategories.length ? '모두 접기' : '모두 펼치기'}
+              {expandedGroups.size === sortedCategories.length ? tList("collapseAll") : tList("expandAll")}
             </Button>
           </div>
         </CardHeader>
@@ -234,45 +257,63 @@ const PermissionList = React.memo(function PermissionList({
               ))}
             </TableHeader>
             <TableBody>
-              {sortedCategories.map((category) => (
-                <React.Fragment key={category}>
-                  {/* 카테고리 헤더 */}
-                  <TableRow className="bg-muted/50 hover:bg-muted">
-                    <TableCell colSpan={1 + table.getVisibleFlatColumns().length} className="py-2">
-                      <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleGroup(category)}>
-                        {expandedGroups.has(category) ? (
-                          <ExpandLessIcon className="h-4 w-4" />
-                        ) : (
-                          <ExpandMoreIcon className="h-4 w-4" />
-                        )}
-                        <span className="font-medium">{category}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {groupedPermissions[category].length}
-                        </Badge>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+              {sortedCategories.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={1 + table.getVisibleFlatColumns().length} className="h-24 text-center text-muted-foreground">
+                    {tList("empty")}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                sortedCategories.map((category) => (
+                  <React.Fragment key={category}>
+                    {/* 카테고리 헤더 */}
+                    <TableRow className="bg-muted/50 hover:bg-muted">
+                      <TableCell colSpan={1 + table.getVisibleFlatColumns().length} className="py-2">
+                        <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleGroup(category)}>
+                          {expandedGroups.has(category) ? (
+                            <ExpandLessIcon className="h-4 w-4" />
+                          ) : (
+                            <ExpandMoreIcon className="h-4 w-4" />
+                          )}
+                          <span className="font-medium">{category}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {groupedPermissions[category].length}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                    </TableRow>
 
-                  {/* 카테고리 내 권한들 */}
-                  {expandedGroups.has(category) && groupedPermissions[category].map((permission) => {
-                    const row = table.getRowModel().rows.find(r => r.original.id === permission.id);
-                    if (!row) return null;
-                       
-                    return (
-                      <TableRow key={permission.id} className="hover:bg-muted/50">
-                        <TableCell>
-                          <div className="w-5 h-px bg-border ml-2" />
-                        </TableCell>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} className={cell.column.id === 'isSystem' || cell.column.id === 'isActive' || cell.column.id === 'actions' ? 'text-center' : ''}>
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
+                    {/* 카테고리 내 권한들 */}
+                    {expandedGroups.has(category) &&
+                      groupedPermissions[category].map((permission) => {
+                        const row = table.getRowModel().rows.find((r) => r.original.id === permission.id);
+                        if (!row) return null;
+
+                        return (
+                          <TableRow key={permission.id} className="hover:bg-muted/50">
+                            <TableCell>
+                              <div className="w-5 h-px bg-border ml-2" />
+                            </TableCell>
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell
+                                key={cell.id}
+                                className={
+                                  cell.column.id === "isSystem" ||
+                                  cell.column.id === "isActive" ||
+                                  cell.column.id === "actions"
+                                    ? "text-center"
+                                    : ""
+                                }
+                              >
+                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        );
+                      })}
+                  </React.Fragment>
+                ))
+              )}
             </TableBody>
           </Table>
 
@@ -285,21 +326,15 @@ const PermissionList = React.memo(function PermissionList({
         open={deleteDialog.open}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="권한 삭제"
+        title={tList("deleteDialogTitle")}
         content={
           <div className="space-y-2">
-            <p>
-              <span className="font-semibold">
-                {deleteDialog.permission?.displayName}
-              </span>
-              {" 권한을 삭제하시겠습니까?"}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              이 작업은 되돌릴 수 없습니다.
-            </p>
+            <p>{tList("deleteConfirm", { name: deleteDialog.permission?.displayName ?? "" })}</p>
+            <p className="text-sm text-muted-foreground">{tList("deleteIrreversible")}</p>
           </div>
         }
-        confirmText="삭제"
+        confirmText={tList("deleteConfirmButton")}
+        cancelText={tList("cancel")}
         confirmButtonColor="destructive"
         icon={<WarningIcon className="h-5 w-5 text-warning" />}
       />

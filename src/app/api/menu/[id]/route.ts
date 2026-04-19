@@ -6,13 +6,14 @@ import { prisma } from "@/lib/prisma";
 export const PUT = withPermissionGuard('menu.update', async (req, { params }) => {
   const { id } = await params;
   const body = await req.json();
-  const { title, path, icon, order, parentId, isActive, isSystem, permissionIds } = body;
+  const { title, titleKey, path, icon, order, parentId, isActive, isSystem, permissionIds } = body;
 
   const updatedMenu = await prisma.$transaction(async (tx) => {
     return await tx.menu.update({
       where: { id: Number(id) },
       data: {
         title,
+        titleKey,
         path,
         icon,
         order,

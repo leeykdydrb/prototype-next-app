@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader } from '@/components/framework/layout';
 import { Badge } from '@/components/framework/data-display';
 import { CheckCircle, ChevronRight } from 'lucide-react';
@@ -16,18 +17,20 @@ interface LightingStatusProps {
 }
 
 export default function LightingStatus({ data }: LightingStatusProps) {
+  const t = useTranslations('Dashboard.lighting');
+
   return (
     <Card className="py-2 gap-2 h-full">
-      <CardHeader title="조명" titleSize="lg" />
+      <CardHeader title={t('title')} titleSize="lg" />
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-2 px-4 font-medium text-gray-700">Status</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">조명ID</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">Ping</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">밝기</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colStatus')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colLightId')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colPing')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colBrightness')}</th>
               </tr>
             </thead>
             <tbody>

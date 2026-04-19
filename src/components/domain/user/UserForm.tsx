@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { Plus as AddIcon, UserCog as UserManagementIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import ContentHeader from "@/components/common/ContentHeader";
 import StatsCard from "@/components/common/StatsCard";
@@ -13,7 +14,7 @@ import { useUserQuery, useUserCreate, useUserUpdate, useUserDelete } from '@/hoo
 import { useUserStats } from "@/hooks/user/useUserStats";
 import { useUserFilters } from "@/hooks/user/useUserFilters";
 
-import { MESSAGES, STAT_CONFIG } from "@/constants/user";
+import { STAT_CONFIG } from "@/constants/user";
 import { showSuccess } from "@/lib/toast";
 import type { UserData, UserInput } from '@/types/user';
 
@@ -22,6 +23,9 @@ import UserList from './UserList';
 
 export default function UserForm() {
   console.log("UserForm");
+  const t = useTranslations('AdminUsers');
+  const tToast = useTranslations('AdminUsers.toast');
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
 
@@ -46,8 +50,16 @@ export default function UserForm() {
 
   // 통계 정보
   const stats = useUserStats(users);
+  const statConfig = useMemo(
+    () =>
+      STAT_CONFIG.map(({ key, color }) => ({
+        key,
+        color,
+        label: t(`stats.${key}`),
+      })),
+    [t],
+  );
 
-  // 필터링된 사용자 목록
   const filteredUsers = useMemo(() => {
     const startIndex = page * rowsPerPage;
     const endIndex = startIndex + rowsPerPage;
@@ -70,19 +82,19 @@ export default function UserForm() {
     const mutationOption = {
       onSuccess: () => {
         handleClose();
-        showSuccess(editingUser ? MESSAGES.USER_UPDATE_SUCCESS : MESSAGES.USER_CREATE_SUCCESS);
+        showSuccess(editingUser ? tToast('updateSuccess') : tToast('createSuccess'));
       }
     };
     
     if (editingUser) updateMutation.mutate({ ...submitData }, mutationOption);
     else createMutation.mutate(submitData, mutationOption);
-  }, [editingUser, updateMutation, createMutation, handleClose]);
+  }, [editingUser, updateMutation, createMutation, handleClose, tToast]);
 
   const handleDelete = useCallback((user: UserData) => {
     deleteMutation.mutate({ id: user.id }, {
-      onSuccess: () => showSuccess(MESSAGES.USER_DELETE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('deleteSuccess'))
     });
-  }, [deleteMutation]);
+  }, [deleteMutation, tToast]);
 
   const handleToggle = useCallback((user: UserData) => {
     // 사용자 활성/비활성 상태만 변경
@@ -91,27 +103,26 @@ export default function UserForm() {
       roleId: user.role.id,
       isActive: !user.isActive
     }, {
-      onSuccess: () => showSuccess(MESSAGES.USER_TOGGLE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('toggleSuccess'))
     });
-  }, [updateMutation]);
+  }, [updateMutation, tToast]);
 
   // 로딩 및 에러 처리
-  if (isLoading && users.length === 0) return <Loading message={MESSAGES.LOADING} />;
-  if (error) return <ErrorMessage message={MESSAGES.ERROR_LOADING} />;
+  if (isLoading && users.length === 0) return <Loading message={t('loading')} />;
+  if (error) return <ErrorMessage message={t('errorLoading')} />;
 
   return (
     <div className="w-full">
       {/* 컨텐츠 헤더 */}
       <ContentHeader
         icon={<UserManagementIcon className="h-6 w-6" />}
-        title="사용자 관리"
+        title={t('header.title')}
         actionIcon={<AddIcon className="h-4 w-4 mr-2" />}
-        actionLabel="사용자 추가"
+        actionLabel={t('header.addUser')}
         onAction={() => handleOpen()}
       />
 
-      {/* 통계 카드 */}
-      <StatsCard stats={stats} statConfig={STAT_CONFIG} />
+      <StatsCard stats={stats} statConfig={statConfig} />
 
       {/* 검색 및 필터 */}
       <SearchFilter

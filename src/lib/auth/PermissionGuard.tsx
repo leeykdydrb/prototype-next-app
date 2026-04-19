@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, usePathname } from 'next/navigation';
+import { usePathname, useRouter } from '@/i18n/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { useUserStore } from '@/store/userStore';
 import { useMenuStore } from '@/store/menuStore';
@@ -29,7 +29,10 @@ export default function PermissionGuard({
 
     // 사용자가 없으면 로그인 페이지로 리다이렉트
     if (!user) {
-      router.push('/auth/signin');
+      const callbackUrl = encodeURIComponent(window.location.href);
+      window.location.assign(
+        `/api/auth/signin/keycloak?callbackUrl=${callbackUrl}`
+      );
       return;
     }
 

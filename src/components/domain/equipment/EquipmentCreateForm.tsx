@@ -6,8 +6,13 @@ import { Card, CardContent, CardHeader } from "@/components/framework/layout";
 import { Button, FormField, FormGroup, FormSection, Input, Label, Switch } from "@/components/framework/form";
 import { Alert } from "@/components/framework/feedback";
 import { Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function EquipmentCreateForm() {
+  const t = useTranslations("Equipment.create");
+  const tFields = useTranslations("Equipment.create.fields");
+  const tJob = useTranslations("Equipment.create.job");
+  const tMsg = useTranslations("Equipment.create.messages");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [isActive, setIsActive] = useState(true);
@@ -19,7 +24,7 @@ export default function EquipmentCreateForm() {
     e.preventDefault();
 
     if (!name || !location) {
-      setMessage("❌ 설비 이름과 위치를 입력해주세요.");
+      setMessage(`❌ ${tMsg("required")}`);
       return;
     }
 
@@ -30,16 +35,16 @@ export default function EquipmentCreateForm() {
         location,
         isActive,
       });
-      setMessage("✅ 작업이 생성되었습니다. 처리 중...");
+      setMessage(`✅ ${tMsg("jobCreated")}`);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "알 수 없는 오류";
-      setMessage(`❌ 작업 생성 실패: ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : tMsg("unknownError");
+      setMessage(`❌ ${tMsg("jobCreateFailed", { message: errorMessage })}`);
     }
   };
 
   const handleJobComplete = (result: JsonObject) => {
     const equipmentId = typeof result.equipmentId === 'string' ? result.equipmentId : undefined;
-    setMessage(`✅ 설비 등록 완료 설비ID: ${equipmentId || name}`);
+    setMessage(`✅ ${tMsg("completed", { id: equipmentId || name })}`);
     // 작업 ID 리셋하여 폼 활성화
     resetJob();
     // 폼 초기화
@@ -49,7 +54,7 @@ export default function EquipmentCreateForm() {
   };
 
   const handleJobError = (error: string) => {
-    setMessage(`❌ 작업 처리 실패: ${error}`);
+    setMessage(`❌ ${tMsg("jobFailed", { error })}`);
     // 에러 발생 시에도 작업 ID 리셋하여 폼 활성화
     resetJob();
   };
@@ -60,19 +65,19 @@ export default function EquipmentCreateForm() {
     <div className="w-full max-w-2xl mx-auto p-4">
       <Card>
         <CardHeader 
-          title="설비 등록" 
-          description="새로운 설비를 등록합니다. 작업은 비동기로 처리됩니다."
+          title={t("title")}
+          description={t("description")}
         />
         <CardContent>
           <form onSubmit={handleSubmit}>
             <FormSection>
               <FormGroup columns={1} className="pb-0">
                 <FormField>
-                  <Label htmlFor="name" required>설비 이름</Label>
+                  <Label htmlFor="name" required>{tFields("name")}</Label>
                   <Input
                     id="name"
                     type="text"
-                    placeholder="설비 이름을 입력하세요"
+                    placeholder={tFields("namePlaceholder")}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     disabled={isDisabled}
@@ -82,11 +87,11 @@ export default function EquipmentCreateForm() {
                 </FormField>
 
                 <FormField>
-                  <Label htmlFor="location" required>설비 위치</Label>
+                  <Label htmlFor="location" required>{tFields("location")}</Label>
                   <Input
                     id="location"
                     type="text"
-                    placeholder="설비 위치를 입력하세요"
+                    placeholder={tFields("locationPlaceholder")}
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     disabled={isDisabled}
@@ -103,7 +108,7 @@ export default function EquipmentCreateForm() {
                       disabled={isDisabled}
                     />
                     <Label htmlFor="isActive" className="cursor-pointer">
-                      가동 중
+                      {tFields("isActiveLabel")}
                     </Label>
                   </div>
                 </FormField>
@@ -119,15 +124,15 @@ export default function EquipmentCreateForm() {
                 {isLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    작업 생성 중...
+                    {tJob("creating")}
                   </>
                 ) : jobId ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    처리 중...
+                    {tJob("processing")}
                   </>
                 ) : (
-                  "등록"
+                  t("actions.submit")
                 )}
               </Button>
             </div>
@@ -146,7 +151,7 @@ export default function EquipmentCreateForm() {
           {/* 작업 상태 표시 */}
           {jobId && (
             <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-4">작업 상태</h3>
+              <h3 className="text-lg font-semibold mb-4">{tJob("statusTitle")}</h3>
               <JobStatus
                 jobId={jobId}
                 onComplete={handleJobComplete}

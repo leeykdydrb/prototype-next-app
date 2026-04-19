@@ -1,13 +1,14 @@
 "use client"
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Form, DialogComponents, AccordionComponents } from "@/components/framework";
 
 import type { RoleData, RoleInput, RoleDialogProps } from "@/types/role";
 import type { PermissionData } from "@/types/permission";
 
 import { usePermissionQuery } from '@/hooks/permission/usePermissionQuery';
-import { MESSAGES } from '@/constants/role';
+import { showError } from "@/lib/toast";
 
 // 초기 폼 데이터 생성 함수
 const getInitialFormData = (role: RoleData | null): RoleInput => {
@@ -81,6 +82,10 @@ const PermissionCategory = React.memo(({
 PermissionCategory.displayName = 'PermissionCategory';
 
 export default function RoleDialog({ open, onClose, onSubmit, role }: RoleDialogProps) {
+  const t = useTranslations("AdminRoles.dialog");
+  const tFields = useTranslations("AdminRoles.dialog.fields");
+  const tToast = useTranslations("AdminRoles.toast");
+
   const [formData, setFormData] = useState<RoleInput>(() => getInitialFormData(null));
   const [editingRole, setEditingRole] = useState<RoleData | null>(null);
   const { data: permissions = [] } = usePermissionQuery({ isActive: true });
@@ -114,11 +119,11 @@ export default function RoleDialog({ open, onClose, onSubmit, role }: RoleDialog
 
   const handleSubmit = useCallback(() => {
     if (!isValid) {
-      alert(MESSAGES.ROLE_REQUIRED_FIELDS);
+      showError(tToast("requiredFields"));
       return;
     }
     onSubmit(formData);
-  }, [isValid, formData, onSubmit]);
+  }, [isValid, formData, onSubmit, tToast]);
 
   const handlePermissionToggle = useCallback((permissionId: number) => {
     setFormData((prev) => ({
@@ -133,49 +138,49 @@ export default function RoleDialog({ open, onClose, onSubmit, role }: RoleDialog
     <DialogComponents.Root open={open} onOpenChange={onClose}>
       <DialogComponents.Content size="3xl">
         <DialogComponents.Header
-          title={editingRole ? "역할 수정" : "역할 추가"}
-          description="역할 정보를 입력하고 권한을 선택하세요. 필수 항목은 역할명, 표시명, 권한입니다."
+          title={editingRole ? t("titleEdit") : t("titleCreate")}
+          description={t("description")}
         />
         <DialogComponents.Body>
           <Form.Section>
             <Form.Group columns={2} className="pb-0">
-              <Form.Field helpText="영문 대문자로 입력하세요">
-                <Form.Label htmlFor="roleName" required>역할명</Form.Label>
+              <Form.Field helpText={tFields("nameHelp")}>
+                <Form.Label htmlFor="roleName" required>{tFields("name")}</Form.Label>
                 <Form.Input
                   id="roleName"
                   value={formData.name}
                   onChange={(e) => handleFieldChange('name', e.target.value.toUpperCase())}
-                  placeholder="예: MANAGER"
+                  placeholder={tFields("namePlaceholder")}
                   className="uppercase"
                   required={formData.name.trim() === ''}
                   autoFocus={!role}
                 />
               </Form.Field>
-              <Form.Field helpText="사용자에게 표시될 이름입니다">
-                <Form.Label htmlFor="displayName" required>표시명</Form.Label>
+              <Form.Field helpText={tFields("displayNameHelp")}>
+                <Form.Label htmlFor="displayName" required>{tFields("displayName")}</Form.Label>
                 <Form.Input
                   id="displayName"
                   value={formData.displayName}
                   onChange={(e) => handleFieldChange('displayName', e.target.value)}
-                  placeholder="예: 매니저"
+                  placeholder={tFields("displayNamePlaceholder")}
                   required={formData.displayName.trim() === ''}
                 />
               </Form.Field>
             </Form.Group>
             <Form.Group>
-              <Form.Field helpText="역할에 대한 설명을 입력하세요">
-                <Form.Label htmlFor="description">설명</Form.Label>
+              <Form.Field helpText={tFields("descriptionHelp")}>
+                <Form.Label htmlFor="description">{tFields("description")}</Form.Label>
                 <Form.Textarea
                   id="description"
                   value={formData.description || ""}
                   onChange={(e) => handleFieldChange('description', e.target.value)}
-                  placeholder="예: 사용자 관리 권한"
+                  placeholder={tFields("descriptionPlaceholder")}
                 />
               </Form.Field>
             </Form.Group>
             <Form.Group>
               <Form.Field>
-                <Form.Label required>권한 선택</Form.Label>
+                <Form.Label required>{tFields("permissions")}</Form.Label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {Object.entries(permissionsByCategory).map(
                     ([category, categoryPermissions]) => (
@@ -196,10 +201,10 @@ export default function RoleDialog({ open, onClose, onSubmit, role }: RoleDialog
 
         <DialogComponents.Footer>
           <Form.Button variant="outline" onClick={onClose}>
-            취소
+            {t("cancel")}
           </Form.Button>
           <Form.Button onClick={handleSubmit} disabled={!isValid}>
-            {editingRole ? "수정" : "추가"}
+            {editingRole ? t("submitEdit") : t("submitCreate")}
           </Form.Button>
         </DialogComponents.Footer>
       </DialogComponents.Content>

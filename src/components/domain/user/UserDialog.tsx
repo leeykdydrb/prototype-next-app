@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations } from 'next-intl';
 import { Form, FormDialog, Alert, AccordionComponents } from "@/components/framework";
 
 import type { UserDialogProps, UserInput, UserData } from "@/types/user";
 import type { PermissionData } from "@/types/permission";
 import { usePermissionQuery } from '@/hooks/permission/usePermissionQuery';
-import { MESSAGES } from '@/constants/user';
 import { showError } from '@/lib/toast';
 
 // 초기 폼 데이터 생성 함수
@@ -20,12 +20,11 @@ const getInitialFormData = (user: UserData | null): UserInput => {
       roleId: user.role.id,
       isSystem: user.isSystem,
       isActive: user.isActive,
-      permissionIds: user.userPermissions
-        .filter(perm => perm.granted)
-        .map(perm => perm.permissionId) || [],
+      permissionIds:
+        user.userPermissions.filter((perm) => perm.granted).map((perm) => perm.permissionId) || [],
     };
   }
-  
+
   return {
     id: "",
     name: "",
@@ -89,6 +88,10 @@ const PermissionCategory = React.memo(({
 PermissionCategory.displayName = 'PermissionCategory';
 
 export default function UserDialog({ open, onClose, onSubmit, user, roles }: UserDialogProps) {
+  const t = useTranslations('AdminUsers.dialog');
+  const tFields = useTranslations('AdminUsers.dialog.fields');
+  const tToast = useTranslations('AdminUsers.toast');
+
   const [formData, setFormData] = useState<UserInput>(() => getInitialFormData(null));
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const { data: permissions = [] } = usePermissionQuery({ isActive: true });
@@ -124,7 +127,7 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
   const formFields = useMemo(() => [
     {
       name: "id",
-      label: "아이디",
+      label: tFields('id'),
       type: "text" as const,
       required: true,
       disabled: !!editingUser,
@@ -132,26 +135,26 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
     },
     {
       name: "password",
-      label: "비밀번호",
+      label: tFields('password'),
       type: "password" as const,
       required: !editingUser,
-      helpText: editingUser ? "수정 시 비워두면 변경되지 않습니다." : undefined,
+      helpText: editingUser ? tFields('passwordHelpEdit') : undefined,
     },
     {
       name: "name",
-      label: "이름",
+      label: tFields('name'),
       type: "text" as const,
       required: true,
     },
     {
       name: "email",
-      label: "이메일",
+      label: tFields('email'),
       type: "email" as const,
       required: true,
     },
     {
       name: "roleId",
-      label: "역할",
+      label: tFields('role'),
       type: "select" as const,
       required: true,
       options: roles.map(role => ({ value: role.id, label: role.displayName })),
@@ -164,15 +167,15 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
     },
     {
       name: "isActive",
-      label: "활성화",
+      label: tFields('isActive'),
       type: "switch" as const,
     },
     {
       name: "isSystem",
-      label: "시스템 사용자",
+      label: tFields('isSystem'),
       type: "switch" as const,
     },
-  ], [editingUser, roles]);
+  ], [editingUser, roles, tFields]);
 
   // FormDialog의 데이터 변경 핸들러
   const handleFormDataChange = useCallback((data: Record<string, string | number | boolean | null | undefined>) => {
@@ -208,7 +211,7 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
   // 제출 핸들러
   const handleSubmit = useCallback((data: Record<string, string | number | boolean | null | undefined>) => {
     if (!isValid) {
-      showError(MESSAGES.USER_REQUIRED_FIELDS);
+      showError(tToast('requiredFields'));
       return;
     }
     // FormDialog의 data와 현재 formData(권한 포함)를 병합
@@ -223,13 +226,13 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
       permissionIds: formData.permissionIds || [],
     };
     onSubmit(submitData);
-  }, [isValid, formData, onSubmit]);
+  }, [isValid, formData, onSubmit, tToast]);
 
   // 권한 선택 커스텀 콘텐츠 (메모화)
   const permissionContent = useMemo(() => (
-    <Form.Section title="권한 선택">
+    <Form.Section title={t('permissionsSection')}>
       <Alert variant="warning">
-        <strong>주의:</strong> 선택한 권한은 사용자의 역할과 무관하게 직접 부여됩니다. 신중하게 선택해주세요.
+        <strong>{t('permissionsWarningLead')}</strong> {t('permissionsWarningBody')}
       </Alert>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -246,18 +249,19 @@ export default function UserDialog({ open, onClose, onSubmit, user, roles }: Use
         )}
       </div>
     </Form.Section>
-  ), [permissionsByCategory, formData.permissionIds, handlePermissionToggle]);
+  ), [permissionsByCategory, formData.permissionIds, handlePermissionToggle, t]);
 
   return (
     <FormDialog
       open={open}
       onClose={onClose}
       onSubmit={handleSubmit}
-      title={editingUser ? "사용자 수정" : "사용자 추가"}
-      description="사용자 정보를 입력하고 권한을 설정하세요."
+      title={editingUser ? t('titleEdit') : t('titleCreate')}
+      description={t('description')}
       fields={formFields}
       initialData={initialData}
-      submitLabel={editingUser ? "수정" : "추가"}
+      submitLabel={editingUser ? t('submitEdit') : t('submitCreate')}
+      cancelLabel={t('cancel')}
       columns={2}
       size="3xl"
       customContent={permissionContent}

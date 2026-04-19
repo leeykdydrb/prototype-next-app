@@ -1,0 +1,11 @@
+import { redirect } from "@/i18n/navigation";
+
+export default async function LocaleHomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  console.log("LocaleHomePage");
+  const { locale } = await params;
+  redirect({ href: "/dashboard", locale });
+}

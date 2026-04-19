@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 
 import { CardComponents } from '@/components/framework/layout';
 import { Plus as AddIcon, Code as CodeIcon, Folder as CategoryIcon, Loader2 } from "lucide-react";
@@ -16,7 +17,7 @@ import StatsCard from "@/components/common/StatsCard";
 import SearchFilter from "@/components/common/SearchFilter";
 import Loading from "@/components/common/Loading";
 import ErrorMessage from "@/components/common/ErrorMessage";
-import { MESSAGES, CODE_GROUP_STAT_CONFIG, CODE_STAT_CONFIG, CODE_GROUP_FILTER_FIELDS, CODE_FILTER_FIELDS } from '@/constants/code';
+import { CODE_GROUP_STAT_CONFIG, CODE_STAT_CONFIG } from '@/constants/code';
 
 import { showSuccess, showError } from "@/lib/toast";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,10 @@ import CodeList from "./CodeList";
 
 export default function CodeForm() {
   console.log("CodeForm");
+  const t = useTranslations("AdminCodes");
+  const tToast = useTranslations("AdminCodes.toast");
+  const tStatsGroup = useTranslations("AdminCodes.stats.group");
+  const tStatsCode = useTranslations("AdminCodes.stats.code");
 
   // 코드 그룹 관련
   const [selectedCodeGroup, setSelectedCodeGroup] = useState<CodeGroupData | null>(null);
@@ -39,6 +44,7 @@ export default function CodeForm() {
   const {
     filters: codeGroupFilters,
     searchParams: codeGroupSearchParams,
+    filterFields: codeGroupFilterFields,
     handleFilterChange: handleCodeGroupFilterChange,
     handleClearFilters: handleClearCodeGroupFilters,
   } = useCodeGroupFilters();
@@ -49,6 +55,7 @@ export default function CodeForm() {
   const {
     filters: codeFilters,
     searchParams: codeSearchParams,
+    filterFields: codeFilterFields,
     handleFilterChange: handleCodeFilterChange,
     handleClearFilters: handleClearCodeFilters,
   } = useCodeFilters();
@@ -75,6 +82,22 @@ export default function CodeForm() {
   const groupStats = useCodeGroupStats(codeGroupData);
   const codeStats = useCodeStats(selectedCodeGroup ? (codeLoading ? allCodeData : codes) : allCodeData);
 
+  const codeGroupStatConfig = useMemo(() => {
+    return CODE_GROUP_STAT_CONFIG.map((c) => ({
+      ...c,
+      key: c.key as (typeof c.key),
+      label: tStatsGroup(c.key),
+    }));
+  }, [tStatsGroup]);
+
+  const codeStatConfig = useMemo(() => {
+    return CODE_STAT_CONFIG.map((c) => ({
+      ...c,
+      key: c.key as (typeof c.key),
+      label: tStatsCode(c.key),
+    }));
+  }, [tStatsCode]);
+
   // 그룹 선택
   const handleSelectCodeGroup = useCallback((group: CodeGroupData) => {
     setSelectedCodeGroup(group);
@@ -98,37 +121,37 @@ export default function CodeForm() {
     const mutationOption = {
       onSuccess: () => {
         handleCloseCodeGroupDialog();
-        showSuccess(editingCodeGroup ? MESSAGES.CODE_GROUP_UPDATE_SUCCESS : MESSAGES.CODE_GROUP_CREATE_SUCCESS);
+        showSuccess(editingCodeGroup ? tToast("groupUpdateSuccess") : tToast("groupCreateSuccess"));
       }
     };
 
     if (editingCodeGroup) updateCodeGroupMutation.mutate({ ...editingCodeGroup, ...formData }, mutationOption);
     else createCodeGroupMutation.mutate(formData, mutationOption);
-  }, [editingCodeGroup, updateCodeGroupMutation, createCodeGroupMutation, handleCloseCodeGroupDialog]);
+  }, [editingCodeGroup, updateCodeGroupMutation, createCodeGroupMutation, handleCloseCodeGroupDialog, tToast]);
 
   const handleDeleteCodeGroup = useCallback((group: CodeGroupData) => {
     if (group.isSystem) {
-      showError(MESSAGES.CODE_GROUP_SYSTEM_DELETE_ERROR);
+      showError(tToast("groupSystemDeleteError"));
       return;
     }
     deleteCodeGroupMutation.mutate({ id: group.id }, {
       onSuccess: () => {
-        showSuccess(MESSAGES.CODE_GROUP_DELETE_SUCCESS);
+        showSuccess(tToast("groupDeleteSuccess"));
         if (selectedCodeGroup?.id === group.id) {
           setSelectedCodeGroup(null);
         }
       }
     });
-  }, [deleteCodeGroupMutation, selectedCodeGroup]);
+  }, [deleteCodeGroupMutation, selectedCodeGroup, tToast]);
 
   const handleToggleCodeGroupStatus = useCallback((group: CodeGroupData) => {
     updateCodeGroupMutation.mutate({
       ...group,
       isActive: !group.isActive
     }, {
-      onSuccess: () => showSuccess(MESSAGES.CODE_GROUP_TOGGLE_SUCCESS)
+      onSuccess: () => showSuccess(tToast("groupToggleSuccess"))
     });
-  }, [updateCodeGroupMutation]);
+  }, [updateCodeGroupMutation, tToast]);
 
   // 코드 핸들러
   const handleOpenCodeDialog = useCallback((code?: CodeData) => {
@@ -145,43 +168,43 @@ export default function CodeForm() {
     const mutationOption = {
       onSuccess: () => {
         handleCloseCodeDialog();
-        showSuccess(editingCode ? MESSAGES.CODE_UPDATE_SUCCESS : MESSAGES.CODE_CREATE_SUCCESS);
+        showSuccess(editingCode ? tToast("codeUpdateSuccess") : tToast("codeCreateSuccess"));
       }
     };
 
     if (editingCode) updateCodeMutation.mutate({ ...editingCode, ...formData }, mutationOption);
     else createCodeMutation.mutate(formData, mutationOption);
-  }, [editingCode, updateCodeMutation, createCodeMutation, handleCloseCodeDialog]);
+  }, [editingCode, updateCodeMutation, createCodeMutation, handleCloseCodeDialog, tToast]);
 
   const handleDeleteCode = useCallback((code: CodeData) => {
     if (code.isSystem) {
-      showError(MESSAGES.CODE_SYSTEM_DELETE_ERROR);
+      showError(tToast("codeSystemDeleteError"));
       return;
     }
     deleteCodeMutation.mutate({ id: code.id }, {
-      onSuccess: () => showSuccess(MESSAGES.CODE_DELETE_SUCCESS)
+      onSuccess: () => showSuccess(tToast("codeDeleteSuccess"))
     });
-  }, [deleteCodeMutation]);
+  }, [deleteCodeMutation, tToast]);
 
   const handleToggleCode = useCallback((code: CodeData) => {
     updateCodeMutation.mutate({
       ...code,
       isActive: !code.isActive
     }, {
-      onSuccess: () => showSuccess(MESSAGES.CODE_TOGGLE_SUCCESS)
+      onSuccess: () => showSuccess(tToast("codeToggleSuccess"))
     });
-  }, [updateCodeMutation]);
+  }, [updateCodeMutation, tToast]);
 
   // 로딩 및 에러 처리
-  if (codeGroupLoading && codeGroupData.length === 0) return <Loading message={MESSAGES.LOADING} />;
-  if (codeGroupError) return <ErrorMessage message={MESSAGES.ERROR_LOADING} />;
+  if (codeGroupLoading && codeGroupData.length === 0) return <Loading message={t("loading.page")} />;
+  if (codeGroupError) return <ErrorMessage message={t("error.load")} />;
 
   return (
     <div className="w-full">
       {/* 컨텐츠 헤더 */}
       <ContentHeader
         icon={<CodeIcon className="h-6 w-6" />}
-        title="코드 관리"
+        title={t("header.title")}
         className="mb-8"
       />
 
@@ -190,16 +213,16 @@ export default function CodeForm() {
         {/* 마스터 (코드 그룹) */}
         <div className="flex flex-col min-h-0">
           {/* 코드 그룹 통계 */}
-          <StatsCard stats={groupStats} statConfig={CODE_GROUP_STAT_CONFIG} />
+          <StatsCard stats={groupStats} statConfig={codeGroupStatConfig} />
 
           <CardComponents.Root className="flex-1 flex flex-col gap-2 min-h-0">
             <CardComponents.Header className="px-4 flex-shrink-0">
               <ContentHeader
                 icon={<CategoryIcon className="h-5 w-5" />}
-                title="코드 그룹"
+                title={t("tabs.group")}
                 titleSize="md"
                 actionIcon={<AddIcon className="h-4 w-4 mr-2" />}
-                actionLabel="그룹 추가"
+                actionLabel={t("actions.addGroup")}
                 actionSize="sm"
                 onAction={() => handleOpenCodeGroupDialog()}
                 className="mb-0"
@@ -210,7 +233,7 @@ export default function CodeForm() {
             <div className="px-4 flex-shrink-0">
               <SearchFilter
                 filters={codeGroupFilters}
-                fields={CODE_GROUP_FILTER_FIELDS}
+                fields={codeGroupFilterFields}
                 onFilterChange={handleCodeGroupFilterChange}
                 onClearFilters={handleClearCodeGroupFilters}
               />
@@ -220,7 +243,7 @@ export default function CodeForm() {
             <CardComponents.Content className="flex-1 overflow-auto p-0 min-h-0">
               {codeGroupTree.length === 0 ? (
                 <div className="flex items-center justify-center h-32 text-muted-foreground">
-                  등록된 코드 그룹이 없습니다.
+                  {t("empty.groups")}
                 </div>
               ) : (
                 <CodeGroupList
@@ -239,7 +262,7 @@ export default function CodeForm() {
         {/* 디테일 (코드) */}
         <div className="flex flex-col min-h-0">
           {/* 코드 통계 */}
-          <StatsCard stats={codeStats} statConfig={CODE_STAT_CONFIG} />
+          <StatsCard stats={codeStats} statConfig={codeStatConfig} />
 
           <CardComponents.Root className="flex-1 flex flex-col gap-2 min-h-0">
             <CardComponents.Header className="px-4 flex-shrink-0">
@@ -249,7 +272,7 @@ export default function CodeForm() {
                   title={selectedCodeGroup.groupName}
                   titleSize="md"
                   actionIcon={<AddIcon className="h-4 w-4 mr-2" />}
-                  actionLabel="코드 추가"
+                  actionLabel={t("actions.addCode")}
                   actionSize="sm"
                   onAction={() => handleOpenCodeDialog()}
                   className="mb-0"
@@ -263,7 +286,7 @@ export default function CodeForm() {
                 <div className="px-4 flex-shrink-0">
                   <SearchFilter
                     filters={codeFilters}
-                    fields={CODE_FILTER_FIELDS}
+                    fields={codeFilterFields}
                     onFilterChange={handleCodeFilterChange}
                     onClearFilters={handleClearCodeFilters}
                   />
@@ -274,7 +297,7 @@ export default function CodeForm() {
                   {codeLoading ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin mr-2" />
-                      <span>로딩 중...</span>
+                      <span>{t("loading.codes")}</span>
                     </div>
                   ) : (
                     <CodeList
@@ -289,7 +312,7 @@ export default function CodeForm() {
             ) : (
               <CardComponents.Content className="flex-1 flex items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  왼쪽에서 코드 그룹을 선택하세요
+                  {t("empty.selectGroup")}
                 </div>
               </CardComponents.Content>
             )}

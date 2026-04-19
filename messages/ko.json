@@ -1,0 +1,628 @@
+{
+  "Common": {
+    "loading": "로딩중...",
+    "checkingRole": "로그인 상태를 확인하는 중입니다...",
+    "searchFilter": {
+      "clearFilters": "필터 초기화"
+    },
+    "formDialog": {
+      "required": "{label}은(는) 필수입니다.",
+      "invalid": "{label}이(가) 유효하지 않습니다.",
+      "invalidEmail": "올바른 이메일 형식이 아닙니다.",
+      "invalidNumber": "올바른 숫자 형식이 아닙니다.",
+      "selectPlaceholder": "선택하세요.",
+      "submitDefault": "저장",
+      "cancelDefault": "취소"
+    },
+    "tablePagination": {
+      "rowsPerPage": "페이지당 행 수",
+      "pageOf": "페이지 {current} / {total}",
+      "rangeSummary": "{start}-{end} / {total}개",
+      "selectedSummary": "{total}개 중 {selected}개 행 선택됨",
+      "srFirst": "첫 페이지로 이동",
+      "srPrevious": "이전 페이지",
+      "srNext": "다음 페이지",
+      "srLast": "마지막 페이지로 이동"
+    }
+  },
+  "ProfileMenu": {
+    "aria": "사용자 메뉴",
+    "anonymous": "사용자",
+    "signOut": "로그아웃"
+  },
+  "Metadata": {
+    "title": "Prototype",
+    "description": "Development Framework"
+  },
+  "NavMenu": {
+    "dashboard": "대시보드",
+    "equipment": "설비 관리",
+    "equipmentList": "설비 목록",
+    "equipmentNew": "설비 등록",
+    "reports": "보고서",
+    "settings": "설정",
+    "system": "시스템 관리",
+    "adminUsers": "사용자 관리",
+    "adminCodes": "코드 관리",
+    "adminPermissions": "권한 관리",
+    "adminRoles": "역할 관리",
+    "adminMenus": "메뉴 관리",
+    "deviceControl": "장비 제어",
+    "devices": "디바이스 관리"
+  },
+  "LocaleMenu": {
+    "aria": "언어 선택",
+    "menuTitle": "언어",
+    "lang": {
+      "ko": "한국어",
+      "en": "English"
+    }
+  },
+  "Dashboard": {
+    "status": {
+      "ok": "정상"
+    },
+    "mock": {
+      "modelA": "검사 모델 A",
+      "modelB": "검사 모델 B",
+      "modelC": "검사 모델 C",
+      "modelD": "검사 모델 D",
+      "light1": "조명1"
+    },
+    "onDeviceList": {
+      "title": "OnDevice List",
+      "colStatus": "상태",
+      "colDeviceId": "디바이스 ID",
+      "colIp": "IP"
+    },
+    "detection": {
+      "title": "검출 모델 상태",
+      "colStatus": "상태",
+      "colModelName": "모델 이름",
+      "colFps": "FPS",
+      "colInferenceMs": "추론 시간(ms)",
+      "colConfidence": "신뢰도 점수(%)"
+    },
+    "camera": {
+      "title": "카메라",
+      "colStatus": "상태",
+      "colCameraId": "카메라 ID",
+      "colPing": "Ping",
+      "colFrameRate": "프레임 수신율",
+      "colThroughput": "데이터 처리량(Mbps)"
+    },
+    "lighting": {
+      "title": "조명",
+      "colStatus": "상태",
+      "colLightId": "조명 ID",
+      "colPing": "Ping",
+      "colBrightness": "밝기"
+    },
+    "graphs": {
+      "cpuTemp": "CPU 온도",
+      "gpuTemp": "GPU 온도",
+      "cpuUsage": "CPU 용량",
+      "memoryUsage": "메모리 용량",
+      "diskUsage": "디스크 용량",
+      "seriesA": "시리즈 A",
+      "seriesB": "시리즈 B"
+    }
+  },
+  "DeviceControl": {
+    "actions": {
+      "apply": "적용",
+      "cancel": "취소"
+    },
+    "onDeviceList": {
+      "title": "OnDevice List",
+      "colDeviceId": "디바이스 ID",
+      "colProcess": "공정"
+    },
+    "camera": {
+      "title": "카메라 제어",
+      "tabLeft": "Cam_Left",
+      "tabRight": "Cam_Right",
+      "exposure": "노출(ms)",
+      "gain": "게인(dB)"
+    },
+    "lighting": {
+      "title": "조명 제어",
+      "tabLight": "조명",
+      "channel1": "채널1 밝기",
+      "channel2": "채널2 밝기",
+      "channel3": "채널3 밝기",
+      "channel4": "채널4 밝기"
+    },
+    "appliedValues": {
+      "title": "현재 적용된 제어값",
+      "exposureLine": "노출값: {value}",
+      "gainLine": "게인값: {value}",
+      "channelBrightnessLine": "채널 {channel} 밝기: {value}"
+    }
+  },
+  "AdminUsers": {
+    "header": {
+      "title": "사용자 관리",
+      "addUser": "사용자 추가"
+    },
+    "stats": {
+      "total": "총 사용자",
+      "active": "활성 사용자",
+      "inactive": "비활성 사용자",
+      "system": "시스템 사용자"
+    },
+    "filters": {
+      "searchPlaceholder": "아이디, 사용자명, 이메일로 검색...",
+      "role": "역할",
+      "status": "상태",
+      "all": "전체",
+      "active": "활성",
+      "inactive": "비활성"
+    },
+    "toast": {
+      "createSuccess": "사용자가 성공적으로 생성되었습니다.",
+      "updateSuccess": "사용자 정보가 성공적으로 수정되었습니다.",
+      "deleteSuccess": "사용자가 성공적으로 삭제되었습니다.",
+      "toggleSuccess": "사용자 상태가 변경되었습니다.",
+      "requiredFields": "필수 입력값을 모두 입력해주세요."
+    },
+    "loading": "로딩 중...",
+    "errorLoading": "데이터 로딩 실패",
+    "list": {
+      "cardTitle": "사용자 목록",
+      "columnSettings": "컬럼 설정",
+      "columnSettingsShort": "컬럼",
+      "columns": {
+        "id": "아이디",
+        "name": "사용자명",
+        "email": "이메일",
+        "role": "역할",
+        "isSystem": "시스템 사용자",
+        "isActive": "상태"
+      },
+      "systemBadge": "시스템",
+      "empty": "데이터가 없습니다.",
+      "actionsMenu": "작업",
+      "editUser": "사용자 수정",
+      "deleteUser": "사용자 삭제",
+      "deleteDialogTitle": "사용자 삭제",
+      "deleteConfirm": "{name} 사용자를 삭제하시겠습니까?",
+      "deleteIrreversible": "이 작업은 되돌릴 수 없습니다.",
+      "deleteConfirmButton": "삭제",
+      "cancel": "취소",
+      "selectAllAria": "전체 선택",
+      "selectRowAria": "행 선택"
+    },
+    "dialog": {
+      "titleCreate": "사용자 추가",
+      "titleEdit": "사용자 수정",
+      "description": "사용자 정보를 입력하고 권한을 설정하세요.",
+      "submitCreate": "추가",
+      "submitEdit": "수정",
+      "cancel": "취소",
+      "fields": {
+        "id": "아이디",
+        "password": "비밀번호",
+        "passwordHelpEdit": "수정 시 비워두면 변경되지 않습니다.",
+        "name": "이름",
+        "email": "이메일",
+        "role": "역할",
+        "isActive": "활성화",
+        "isSystem": "시스템 사용자"
+      },
+      "permissionsSection": "권한 선택",
+      "permissionsWarningLead": "주의:",
+      "permissionsWarningBody": "선택한 권한은 사용자의 역할과 무관하게 직접 부여됩니다. 신중하게 선택해주세요."
+    }
+  },
+  "AdminRoles": {
+    "header": {
+      "title": "역할 관리",
+      "addRole": "역할 추가"
+    },
+    "stats": {
+      "total": "총 역할",
+      "active": "활성 역할",
+      "inactive": "비활성 역할",
+      "system": "시스템 역할"
+    },
+    "filters": {
+      "searchPlaceholder": "역할명, 표시명, 설명으로 검색...",
+      "status": "상태",
+      "all": "전체",
+      "active": "활성",
+      "inactive": "비활성"
+    },
+    "toast": {
+      "createSuccess": "역할이 성공적으로 생성되었습니다.",
+      "updateSuccess": "역할이 성공적으로 수정되었습니다.",
+      "deleteSuccess": "역할이 성공적으로 삭제되었습니다.",
+      "toggleSuccess": "역할 상태가 변경되었습니다.",
+      "requiredFields": "필수 입력값을 모두 입력해주세요."
+    },
+    "loading": "로딩 중...",
+    "errorLoading": "데이터 로딩 실패",
+    "list": {
+      "cardTitle": "역할 목록",
+      "columnSettings": "컬럼 설정",
+      "columnSettingsShort": "컬럼",
+      "columns": {
+        "name": "역할명",
+        "displayName": "표시명",
+        "description": "설명",
+        "permissionCount": "권한 수",
+        "userCount": "사용자 수",
+        "isSystem": "시스템 역할",
+        "isActive": "상태",
+        "actions": "작업"
+      },
+      "permissionCountSuffix": "개",
+      "userCountSuffix": "명",
+      "systemBadge": "시스템",
+      "empty": "데이터가 없습니다.",
+      "deleteDialogTitle": "역할 삭제",
+      "deleteConfirm": "{name} 역할을 삭제하시겠습니까?",
+      "deleteIrreversible": "이 작업은 되돌릴 수 없습니다.",
+      "deleteConfirmButton": "삭제",
+      "cancel": "취소"
+    },
+    "dialog": {
+      "titleCreate": "역할 추가",
+      "titleEdit": "역할 수정",
+      "description": "역할 정보를 입력하고 권한을 선택하세요. 필수 항목은 역할명, 표시명, 권한입니다.",
+      "cancel": "취소",
+      "submitCreate": "추가",
+      "submitEdit": "수정",
+      "fields": {
+        "name": "역할명",
+        "nameHelp": "영문 대문자로 입력하세요",
+        "namePlaceholder": "예: MANAGER",
+        "displayName": "표시명",
+        "displayNameHelp": "사용자에게 표시될 이름입니다",
+        "displayNamePlaceholder": "예: 매니저",
+        "description": "설명",
+        "descriptionHelp": "역할에 대한 설명을 입력하세요",
+        "descriptionPlaceholder": "예: 사용자 관리 권한",
+        "permissions": "권한 선택"
+      }
+    }
+  },
+  "AdminMenus": {
+    "header": {
+      "title": "메뉴 관리",
+      "addMenu": "메뉴 추가"
+    },
+    "stats": {
+      "total": "총 메뉴",
+      "active": "활성 메뉴",
+      "inactive": "비활성 메뉴",
+      "system": "시스템 메뉴"
+    },
+    "filters": {
+      "searchPlaceholder": "메뉴명, 경로명으로 검색...",
+      "status": "상태",
+      "all": "전체",
+      "active": "활성",
+      "inactive": "비활성"
+    },
+    "toast": {
+      "createSuccess": "메뉴가 성공적으로 생성되었습니다.",
+      "updateSuccess": "메뉴가 성공적으로 수정되었습니다.",
+      "deleteSuccess": "메뉴가 성공적으로 삭제되었습니다.",
+      "toggleSuccess": "메뉴 상태가 변경되었습니다.",
+      "requiredFields": "필수 입력값을 모두 입력해주세요."
+    },
+    "loading": "로딩 중...",
+    "errorLoading": "데이터 로딩 실패",
+    "list": {
+      "cardTitle": "메뉴 목록",
+      "columnSettings": "컬럼 설정",
+      "columnSettingsShort": "컬럼",
+      "columns": {
+        "menuName": "메뉴명",
+        "path": "경로",
+        "icon": "아이콘",
+        "order": "순서",
+        "isSystem": "시스템 메뉴",
+        "isActive": "상태",
+        "actions": "작업"
+      },
+      "systemBadge": "시스템",
+      "empty": "데이터가 없습니다.",
+      "deleteDialogTitle": "메뉴 삭제",
+      "deleteConfirm": "{name} 메뉴를 삭제하시겠습니까?",
+      "deleteIrreversible": "이 작업은 되돌릴 수 없습니다.",
+      "deleteConfirmButton": "삭제",
+      "cancel": "취소"
+    },
+    "dialog": {
+      "titleCreate": "메뉴 추가",
+      "titleEdit": "메뉴 수정",
+      "description": "메뉴 정보를 입력하고 권한을 선택하세요. 필수 항목은 메뉴명, 타이틀키, 권한입니다.",
+      "cancel": "취소",
+      "submitCreate": "추가",
+      "submitEdit": "수정",
+      "fields": {
+        "title": "메뉴명",
+        "titleHelp": "사용자에게 표시될 메뉴명 입니다",
+        "titlePlaceholder": "예: 대시보드",
+        "titleKey": "타이틀키",
+        "titleKeyHelp": "다국어 번역 키입니다. 번역 파일에 없으면 메뉴명이 그대로 표시됩니다.",
+        "titleKeyPlaceholder": "예: NavMenu.dashboard",
+        "path": "경로",
+        "pathHelp": "메뉴의 경로를 입력하세요",
+        "pathOptionalSuffix": "(선택사항)",
+        "pathPlaceholder": "예: /dashboard, /admin/users",
+        "icon": "아이콘",
+        "iconHelp": "메뉴에 표시될 아이콘을 선택하세요",
+        "iconPlaceholder": "아이콘 선택",
+        "iconNone": "없음",
+        "parentMenu": "상위 메뉴",
+        "parentMenuHelp": "상위 메뉴를 선택하세요",
+        "parentMenuPlaceholder": "상위 메뉴 선택",
+        "parentMenuNone": "최상위 메뉴",
+        "order": "순서",
+        "orderHelp": "메뉴의 표시 순서를 입력하세요",
+        "permissions": "권한",
+        "permissionsHelp": "메뉴에 필요한 권한을 선택하세요",
+        "permissionsSelect": "권한 선택",
+        "permissionsSelectedCount": "{count}개 선택됨",
+        "permissionsSearch": "권한 검색...",
+        "permissionsEmpty": "권한을 찾을 수 없습니다.",
+        "isActiveHelp": "메뉴의 활성화 상태를 설정하세요",
+        "isActiveLabel": "활성화"
+      }
+    }
+  },
+  "AdminPermissions": {
+    "header": {
+      "title": "권한 관리",
+      "addPermission": "권한 추가"
+    },
+    "stats": {
+      "total": "총 권한",
+      "active": "활성 권한",
+      "inactive": "비활성 권한",
+      "system": "시스템 권한"
+    },
+    "filters": {
+      "searchPlaceholder": "권한명, 표시명, 설명으로 검색...",
+      "category": "카테고리",
+      "status": "상태",
+      "all": "전체",
+      "active": "활성",
+      "inactive": "비활성"
+    },
+    "toast": {
+      "createSuccess": "권한이 성공적으로 생성되었습니다.",
+      "updateSuccess": "권한이 성공적으로 수정되었습니다.",
+      "deleteSuccess": "권한이 성공적으로 삭제되었습니다.",
+      "toggleSuccess": "권한 상태가 변경되었습니다.",
+      "requiredFields": "필수 입력값을 모두 입력해주세요."
+    },
+    "loading": "로딩 중...",
+    "errorLoading": "데이터 로딩 실패",
+    "list": {
+      "cardTitle": "권한 목록",
+      "columnSettings": "컬럼 설정",
+      "columnSettingsShort": "컬럼",
+      "columns": {
+        "name": "권한명",
+        "displayName": "표시명",
+        "description": "설명",
+        "isSystem": "시스템 권한",
+        "isActive": "상태",
+        "actions": "작업"
+      },
+      "systemBadge": "시스템",
+      "empty": "데이터가 없습니다.",
+      "collapseAll": "모두 접기",
+      "expandAll": "모두 펼치기",
+      "deleteDialogTitle": "권한 삭제",
+      "deleteConfirm": "{name} 권한을 삭제하시겠습니까?",
+      "deleteIrreversible": "이 작업은 되돌릴 수 없습니다.",
+      "deleteConfirmButton": "삭제",
+      "cancel": "취소"
+    },
+    "dialog": {
+      "titleCreate": "권한 추가",
+      "titleEdit": "권한 수정",
+      "description": "권한 정보를 입력하세요. 필수 항목은 권한명과 표시명입니다.",
+      "cancel": "취소",
+      "submitCreate": "추가",
+      "submitEdit": "수정",
+      "fields": {
+        "name": "권한명",
+        "nameHelp": "영문, 숫자, 점(.)만 사용 가능",
+        "namePlaceholder": "예: dashboard.read",
+        "displayName": "표시명",
+        "displayNamePlaceholder": "예: 대시보드 읽기",
+        "category": "카테고리",
+        "categoryPlaceholder": "카테고리를 선택하세요",
+        "categoryNone": "없음",
+        "description": "설명",
+        "descriptionPlaceholder": "권한에 대한 설명을 입력하세요",
+        "isActiveLabel": "활성화"
+      },
+      "usage": {
+        "title": "사용 현황",
+        "loading": "로딩 중...",
+        "rolesTitle": "연결된 역할 ({count}개)",
+        "usersTitle": "직접 할당된 사용자 ({count}명)",
+        "menusTitle": "연결된 메뉴 ({count}개)"
+      }
+    }
+  },
+  "AdminCodes": {
+    "header": {
+      "title": "코드 관리"
+    },
+    "loading": {
+      "page": "코드를 불러오는 중...",
+      "codes": "로딩 중..."
+    },
+    "error": {
+      "load": "코드를 불러오는데 실패했습니다."
+    },
+    "stats": {
+      "group": {
+        "total": "전체 그룹",
+        "active": "활성 그룹",
+        "inactive": "비활성 그룹",
+        "system": "시스템 그룹"
+      },
+      "code": {
+        "total": "전체 코드",
+        "active": "활성 코드",
+        "inactive": "비활성 코드",
+        "system": "시스템 코드"
+      }
+    },
+    "tabs": {
+      "group": "코드 그룹",
+      "code": "코드"
+    },
+    "actions": {
+      "addGroup": "그룹 추가",
+      "addCode": "코드 추가",
+      "cancel": "취소",
+      "delete": "삭제",
+      "add": "추가",
+      "edit": "수정"
+    },
+    "filters": {
+      "groupSearchPlaceholder": "그룹, 그룹명으로 검색...",
+      "codeSearchPlaceholder": "코드 또는 코드명으로 검색...",
+      "statusLabel": "상태",
+      "status": {
+        "all": "전체",
+        "active": "활성",
+        "inactive": "비활성"
+      }
+    },
+    "empty": {
+      "groups": "등록된 코드 그룹이 없습니다.",
+      "codes": "등록된 코드가 없습니다.",
+      "selectGroup": "왼쪽에서 코드 그룹을 선택하세요"
+    },
+    "toast": {
+      "requiredFields": "필수 입력값을 모두 입력해주세요.",
+      "groupCreateSuccess": "코드 그룹이 생성되었습니다.",
+      "groupUpdateSuccess": "코드 그룹이 수정되었습니다.",
+      "groupDeleteSuccess": "코드 그룹이 삭제되었습니다.",
+      "groupToggleSuccess": "코드 그룹 상태가 변경되었습니다.",
+      "groupSystemDeleteError": "시스템 코드 그룹은 삭제할 수 없습니다.",
+      "codeCreateSuccess": "코드가 생성되었습니다.",
+      "codeUpdateSuccess": "코드가 수정되었습니다.",
+      "codeDeleteSuccess": "코드가 삭제되었습니다.",
+      "codeToggleSuccess": "코드 상태가 변경되었습니다.",
+      "codeSystemDeleteError": "시스템 코드는 삭제할 수 없습니다."
+    },
+    "dialogs": {
+      "group": {
+        "titleCreate": "코드 그룹 추가",
+        "titleEdit": "코드 그룹 수정",
+        "description": "코드 그룹 정보를 입력하세요. 필수 항목은 그룹 코드와 그룹명입니다.",
+        "fields": {
+          "groupCode": "그룹 코드",
+          "groupCodePlaceholder": "예: USER_TYPE",
+          "groupName": "그룹명",
+          "groupNamePlaceholder": "예: 사용자 유형",
+          "description": "설명",
+          "descriptionPlaceholder": "코드 그룹에 대한 설명을 입력하세요",
+          "parentGroup": "부모 그룹",
+          "parentGroupPlaceholder": "선택 안 함",
+          "parentGroupNone": "선택 안 함",
+          "isActiveLabel": "활성화"
+        }
+      },
+      "code": {
+        "titleCreate": "코드 추가",
+        "titleEdit": "코드 수정",
+        "description": "코드 정보를 입력하세요. 필수 항목은 코드와 코드명입니다.",
+        "systemEditWarning": "시스템 코드는 수정할 수 없습니다.",
+        "fields": {
+          "code": "코드",
+          "codePlaceholder": "예: ADMIN",
+          "codeName": "코드명",
+          "codeNamePlaceholder": "예: 관리자",
+          "sortOrder": "정렬 순서",
+          "description": "설명",
+          "descriptionPlaceholder": "코드에 대한 설명을 입력하세요",
+          "isActiveLabel": "활성화"
+        }
+      },
+      "confirm": {
+        "groupDeleteTitle": "코드 그룹 삭제",
+        "groupDeleteQuestion": "{name} 코드 그룹을 삭제하시겠습니까?",
+        "codeDeleteTitle": "코드 삭제",
+        "codeDeleteQuestion": "{name} 코드를 삭제하시겠습니까?",
+        "irreversible": "이 작업은 되돌릴 수 없습니다."
+      }
+    }
+  },
+  "Equipment": {
+    "create": {
+      "title": "설비 등록",
+      "description": "새로운 설비를 등록합니다. 작업은 비동기로 처리됩니다.",
+      "fields": {
+        "name": "설비 이름",
+        "namePlaceholder": "설비 이름을 입력하세요",
+        "location": "설비 위치",
+        "locationPlaceholder": "설비 위치를 입력하세요",
+        "isActiveLabel": "가동 중"
+      },
+      "actions": {
+        "submit": "등록"
+      },
+      "job": {
+        "creating": "작업 생성 중...",
+        "processing": "처리 중...",
+        "statusTitle": "작업 상태"
+      },
+      "messages": {
+        "required": "설비 이름과 위치를 입력해주세요.",
+        "jobCreated": "작업이 생성되었습니다. 처리 중...",
+        "unknownError": "알 수 없는 오류",
+        "jobCreateFailed": "작업 생성 실패: {message}",
+        "completed": "설비 등록 완료 설비ID: {id}",
+        "jobFailed": "작업 처리 실패: {error}"
+      }
+    },
+    "detail": {
+      "title": "설비 상세페이지",
+      "loading": "설비 정보를 불러오는 중입니다...",
+      "notFound": "설비를 찾을 수 없습니다.",
+      "fields": {
+        "id": "설비 ID",
+        "name": "설비 이름",
+        "location": "설비 위치",
+        "status": "가동 상태",
+        "active": "가동 중",
+        "inactive": "정지"
+      }
+    },
+    "edit": {
+      "title": "설비 수정",
+      "loading": "설비 정보를 불러오는 중입니다...",
+      "fields": {
+        "namePlaceholder": "설비 이름",
+        "locationPlaceholder": "설비 위치",
+        "isActiveLabel": "가동 중"
+      },
+      "actions": {
+        "save": "저장"
+      },
+      "messages": {
+        "updated": "{name} 설비가 성공적으로 수정되었습니다."
+      }
+    }
+  },
+  "NotFound": {
+    "title": "페이지를 찾을 수 없습니다",
+    "description": "요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다. URL을 다시 확인하거나 아래 버튼을 사용하여 이동해주세요.",
+    "home": "홈으로 이동",
+    "back": "이전 페이지",
+    "help": "문제가 지속되면 관리자에게 문의해주세요."
+  }
+}

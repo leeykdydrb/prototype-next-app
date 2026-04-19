@@ -7,8 +7,9 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import Loading from "@/components/common/Loading";
+import { useTranslations } from "next-intl";
 
 export default function RoleGuard({
   role,
@@ -17,6 +18,7 @@ export default function RoleGuard({
   role: string;
   children: React.ReactNode;
 }) {
+  const t = useTranslations("Common");
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -26,7 +28,7 @@ export default function RoleGuard({
     }
   }, [status, session?.user?.role, role, router]);
 
-  if (status === "loading") return <Loading message="로그인 상태를 확인하는 중입니다..." />;
+  if (status === "loading") return <Loading message={t("checkingRole")} />;
 
   return <>{children}</>;
 }

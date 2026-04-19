@@ -1,6 +1,7 @@
-"use client"
+'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Select, SelectItem } from "@/components/framework/form";
 import { Card, CardContent } from "@/components/framework/layout";
 import { Search as SearchIcon, X as ClearIcon } from "lucide-react";
@@ -24,6 +25,8 @@ function SearchFilter<T extends object>({
   onFilterChange,
   onClearFilters,
 }: FilterProps<T>) {
+  const t = useTranslations('Common.searchFilter');
+
   // 로컬 검색어 상태 (디바운스 적용)
   const searchField = fields.find(f => f.type === "search");
   const searchKey = searchField?.key;
@@ -130,7 +133,7 @@ function SearchFilter<T extends object>({
               className="w-full cursor-pointer"
             >
               <ClearIcon className="h-4 w-4" />
-              필터 초기화
+              {t('clearFilters')}
             </Button>
           </div>
         </div>

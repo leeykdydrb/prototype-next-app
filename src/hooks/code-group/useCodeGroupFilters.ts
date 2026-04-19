@@ -1,7 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
 import { DEFAULT_ROWS_PER_PAGE } from "@/constants/code";
+import type { FilterField } from "@/components/common/SearchFilter";
+import type { CodeGroupSearchFilters } from "@/types/code-group";
+import { useTranslations } from "next-intl";
 
 export const useCodeGroupFilters = () => {
+  const t = useTranslations("AdminCodes.filters");
   const [filters, setFilters] = useState({
     search: "",
     isActive: "",
@@ -45,10 +49,32 @@ export const useCodeGroupFilters = () => {
     return params;
   }, [filters]);
 
+  const filterFields = useMemo(() => {
+    return [
+      {
+        type: "search",
+        key: "search",
+        id: "code-group-search",
+        placeholder: t("groupSearchPlaceholder"),
+      },
+      {
+        type: "select",
+        key: "isActive",
+        label: t("statusLabel"),
+        options: [
+          { value: "all", label: t("status.all") },
+          { value: "true", label: t("status.active") },
+          { value: "false", label: t("status.inactive") },
+        ],
+      },
+    ] as const satisfies FilterField<CodeGroupSearchFilters>[];
+  }, [t]);
+
   return {
     filters,
     page,
     rowsPerPage,
+    filterFields,
     searchParams,
     handleFilterChange,
     handleClearFilters,

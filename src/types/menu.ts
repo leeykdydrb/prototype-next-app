@@ -1,6 +1,7 @@
 export interface MenuData {
   id: number;
   title: string;
+  titleKey: string;
   path: string | null;
   icon: string | null;
   order: number;

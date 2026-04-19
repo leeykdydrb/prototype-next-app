@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { CodeListProps, CodeData } from "@/types/code";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
+import { useTranslations } from "next-intl";
 
 const CodeList = React.memo(function CodeList({
   codes,
@@ -20,6 +21,9 @@ const CodeList = React.memo(function CodeList({
   onDelete,
   onToggle,
 }: CodeListProps) {
+  const tConfirm = useTranslations("AdminCodes.dialogs.confirm");
+  const tActions = useTranslations("AdminCodes.actions");
+  const tEmpty = useTranslations("AdminCodes.empty");
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     code: CodeData | null;
@@ -46,7 +50,7 @@ const CodeList = React.memo(function CodeList({
         <div className="space-y-0">
           {codes.length === 0 ? (
             <div className="flex items-center justify-center py-8 text-muted-foreground">
-              등록된 코드가 없습니다.
+              {tEmpty("codes")}
             </div>
           ) : (
             <>
@@ -122,21 +126,17 @@ const CodeList = React.memo(function CodeList({
         open={deleteDialog.open}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="코드 삭제"
+        title={tConfirm("codeDeleteTitle")}
         content={
           <div className="space-y-2 text-left">
-            <p>
-              <span className="font-semibold">
-                {deleteDialog.code?.codeName}
-              </span>
-              {" 코드를 삭제하시겠습니까?"}
-            </p>
+            <p>{tConfirm("codeDeleteQuestion", { name: deleteDialog.code?.codeName ?? "" })}</p>
             <p className="text-sm text-muted-foreground">
-              이 작업은 되돌릴 수 없습니다.
+              {tConfirm("irreversible")}
             </p>
           </div>
         }
-        confirmText="삭제"
+        confirmText={tActions("delete")}
+        cancelText={tActions("cancel")}
         confirmButtonColor="destructive"
         icon={<WarningIcon className="h-5 w-5 text-warning" />}
       />

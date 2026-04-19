@@ -20,7 +20,18 @@ import TablePagination from '../TablePagination';
 import Logo from '../Logo';
 import LogoCi from '../LogoCi';
 
+import { NextIntlClientProvider } from 'next-intl';
+import messagesEn from '../../../../messages/en.json';
+
 import type { Table, Row, RowModel } from '@tanstack/react-table';
+
+function renderWithIntl(ui: React.ReactElement) {
+  return render(
+    <NextIntlClientProvider locale="en" messages={messagesEn}>
+      {ui}
+    </NextIntlClientProvider>,
+  );
+}
 import { Search } from 'lucide-react';
 
 describe('Loading', () => {
@@ -285,13 +296,13 @@ describe('SearchFilter', () => {
         ],
       },
     ];
-    render(
+    renderWithIntl(
       <SearchFilter<TestFilters>
         filters={defaultFilters}
         fields={fields}
         onFilterChange={vi.fn()}
         onClearFilters={vi.fn()}
-      />
+      />,
     );
     expect(screen.getByPlaceholderText('Search...')).toBeDefined();
     expect(screen.getByText('Status')).toBeDefined();
@@ -305,13 +316,13 @@ describe('SearchFilter', () => {
     const fields: FilterField<TestFilters>[] = [
       { type: 'search', key: 'search', id: 'search', placeholder: 'Search...' },
     ];
-    render(
+    renderWithIntl(
       <SearchFilter<TestFilters>
         filters={defaultFilters}
         fields={fields}
         onFilterChange={onFilterChange}
         onClearFilters={vi.fn()}
-      />
+      />,
     );
 
     const input = screen.getByPlaceholderText('Search...') as HTMLInputElement;
@@ -340,16 +351,16 @@ describe('SearchFilter', () => {
     const fields: FilterField<TestFilters>[] = [
       { type: 'search', key: 'search', id: 'search', placeholder: 'Search...' },
     ];
-    render(
+    renderWithIntl(
       <SearchFilter<TestFilters>
         filters={{ search: 'test' }}
         fields={fields}
         onFilterChange={vi.fn()}
         onClearFilters={onClearFilters}
-      />
+      />,
     );
 
-    const clearButton = screen.getByText('필터 초기화');
+    const clearButton = screen.getByText('Clear filters');
     await userEvent.click(clearButton);
 
     expect(onClearFilters).toHaveBeenCalledTimes(1);
@@ -365,13 +376,13 @@ describe('SearchFilter', () => {
     const fields: FilterField<TestFilters>[] = [
       { type: 'search', key: 'search', id: 'search', placeholder: 'Search...' },
     ];
-    render(
+    renderWithIntl(
       <SearchFilter<TestFilters>
         filters={{ search: 'test' }}
         fields={fields}
         onFilterChange={vi.fn()}
         onClearFilters={vi.fn()}
-      />
+      />,
     );
 
     // Find clear button by its position (it's inside the search input container)
@@ -402,13 +413,13 @@ describe('SearchFilter', () => {
         ],
       },
     ];
-    render(
+    renderWithIntl(
       <SearchFilter<TestFilters>
         filters={defaultFilters}
         fields={fields}
         onFilterChange={onFilterChange}
         onClearFilters={vi.fn()}
-      />
+      />,
     );
 
     const select = screen.getByRole('combobox');
@@ -563,7 +574,7 @@ describe('TablePagination', () => {
    */
   it('should render pagination controls', () => {
     const table = createMockTable();
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
     expect(screen.getByText(/page 1 of/i)).toBeDefined();
   });
 
@@ -572,7 +583,7 @@ describe('TablePagination', () => {
    */
   it('should display correct range for range type', () => {
     const table = createMockTable();
-    render(<TablePagination table={table} totalCount={50} type="range" />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} type="range" />);
     expect(screen.getByText(/1-10/i)).toBeDefined();
   });
 
@@ -592,7 +603,7 @@ describe('TablePagination', () => {
         rowsById: { 'row-1': selectedRow } as Record<string, Row<TestData>>,
       })),
     });
-    render(<TablePagination table={table} totalCount={50} type="selected" />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} type="selected" />);
     expect(screen.getByText(/row\(s\) selected/i)).toBeDefined();
   });
 
@@ -607,7 +618,7 @@ describe('TablePagination', () => {
     const table1 = createMockTable({
       getCanPreviousPage: vi.fn(() => false),
     });
-    const { unmount: unmount1 } = render(<TablePagination table={table1} totalCount={50} />);
+    const { unmount: unmount1 } = renderWithIntl(<TablePagination table={table1} totalCount={50} />);
     const prevButton1 = screen.getByRole('button', { name: /go to previous page/i }) as HTMLButtonElement;
     const firstButton1 = screen.getByRole('button', { name: /go to first page/i }) as HTMLButtonElement;
     expect(prevButton1.disabled).toBe(true);
@@ -618,7 +629,7 @@ describe('TablePagination', () => {
     const table2 = createMockTable({
       getCanNextPage: vi.fn(() => false),
     });
-    const { unmount: unmount2 } = render(<TablePagination table={table2} totalCount={50} />);
+    const { unmount: unmount2 } = renderWithIntl(<TablePagination table={table2} totalCount={50} />);
     const nextButton2 = screen.getByRole('button', { name: /go to next page/i }) as HTMLButtonElement;
     const lastButton2 = screen.getByRole('button', { name: /go to last page/i }) as HTMLButtonElement;
     expect(nextButton2.disabled).toBe(true);
@@ -630,7 +641,7 @@ describe('TablePagination', () => {
       getCanPreviousPage: vi.fn(() => true),
       getCanNextPage: vi.fn(() => true),
     });
-    render(<TablePagination table={table3} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table3} totalCount={50} />);
     const prevButton3 = screen.getByRole('button', { name: /go to previous page/i }) as HTMLButtonElement;
     const nextButton3 = screen.getByRole('button', { name: /go to next page/i }) as HTMLButtonElement;
     expect(prevButton3.disabled).toBe(false);
@@ -643,7 +654,7 @@ describe('TablePagination', () => {
   it('should call table.nextPage when next button is clicked', async () => {
     const table = createMockTable();
     const nextPageSpy = vi.spyOn(table, 'nextPage');
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
 
     const nextButton = screen.getByRole('button', { name: /go to next page/i });
     await userEvent.click(nextButton);
@@ -659,7 +670,7 @@ describe('TablePagination', () => {
       getCanPreviousPage: vi.fn(() => true),
     });
     const previousPageSpy = vi.spyOn(table, 'previousPage');
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
 
     const prevButton = screen.getByRole('button', { name: /go to previous page/i });
     await userEvent.click(prevButton);
@@ -673,7 +684,7 @@ describe('TablePagination', () => {
   it('should change page size when select value changes', async () => {
     const table = createMockTable();
     const setPageSizeSpy = vi.spyOn(table, 'setPageSize');
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
 
     const select = screen.getByRole('combobox');
     await userEvent.click(select);
@@ -693,7 +704,7 @@ describe('TablePagination', () => {
       getCanPreviousPage: vi.fn(() => true),
     });
     const setPageIndexSpy = vi.spyOn(table, 'setPageIndex');
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
 
     const firstButton = screen.getByRole('button', { name: /go to first page/i });
     await userEvent.click(firstButton);
@@ -710,7 +721,7 @@ describe('TablePagination', () => {
       getPageCount: vi.fn(() => 5),
     });
     const setPageIndexSpy = vi.spyOn(table, 'setPageIndex');
-    render(<TablePagination table={table} totalCount={50} />);
+    renderWithIntl(<TablePagination table={table} totalCount={50} />);
 
     const lastButton = screen.getByRole('button', { name: /go to last page/i });
     await userEvent.click(lastButton);

@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
 import { Plus as AddIcon, Menu as MenuIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 import ContentHeader from "@/components/common/ContentHeader";
 import StatsCard from "@/components/common/StatsCard";
@@ -13,7 +14,7 @@ import { useMenuQuery, useMenuCreate, useMenuUpdate, useMenuDelete } from '@/hoo
 import { useMenuStats } from "@/hooks/menu/useMenuStats";
 import { useMenuFilters } from "@/hooks/menu/useMenuFilters";
 
-import { MESSAGES, STAT_CONFIG, FILTER_FIELDS } from "@/constants/menu";
+import { STAT_CONFIG } from "@/constants/menu";
 import { showSuccess } from "@/lib/toast";
 import type { MenuData, MenuTree, MenuInput } from "@/types/menu";
 import { buildMenuTree } from "@/utils/buildMenuTree";
@@ -23,12 +24,16 @@ import MenuList from './MenuList';
 
 export default function MenuForm() {
   console.log("MenuForm");
+  const t = useTranslations('AdminMenus');
+  const tToast = useTranslations('AdminMenus.toast');
+
   const [dialogOpen, setDialogOpen] = useState<boolean>(false);
   const [editingMenu, setEditingMenu] = useState<MenuTree | null>(null);
 
   // 검색 및 필터
   const {
     filters,
+    filterFields,
     page,
     rowsPerPage,
     searchParams,
@@ -46,6 +51,15 @@ export default function MenuForm() {
 
   // 통계 정보
   const stats = useMenuStats(menus);
+  const statConfig = useMemo(
+    () =>
+      STAT_CONFIG.map(({ key, color }) => ({
+        key,
+        color,
+        label: t(`stats.${key}`),
+      })),
+    [t],
+  );
 
   // 필터링된 메뉴 목록
   const filteredMenus = useMemo(() => {
@@ -74,19 +88,19 @@ export default function MenuForm() {
     const mutationOption = {
       onSuccess: () => {
         handleClose();
-        showSuccess(editingMenu ? MESSAGES.MENU_UPDATE_SUCCESS : MESSAGES.MENU_CREATE_SUCCESS);
+        showSuccess(editingMenu ? tToast('updateSuccess') : tToast('createSuccess'));
       }
     };
 
     if (editingMenu) updateMutation.mutate({ id: editingMenu.id, ...submitData}, mutationOption);
     else createMutation.mutate(submitData, mutationOption);
-  }, [editingMenu, updateMutation, createMutation, handleClose]);
+  }, [editingMenu, updateMutation, createMutation, handleClose, tToast]);
 
   const handleDelete = useCallback((menu: MenuData) => {
     deleteMutation.mutate({ id: menu.id } , {
-      onSuccess: () => showSuccess(MESSAGES.MENU_DELETE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('deleteSuccess'))
     });
-  }, [deleteMutation]);
+  }, [deleteMutation, tToast]);
 
   // 메뉴 상태 변경 요청 처리
   const handleToggle = useCallback((menu: MenuData) => {
@@ -95,32 +109,32 @@ export default function MenuForm() {
       // id: menu.id,
       isActive: !menu.isActive
     }, {
-      onSuccess: () => showSuccess(MESSAGES.MENU_TOGGLE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('toggleSuccess'))
     });
-  }, [updateMutation]);
+  }, [updateMutation, tToast]);
 
   // 로딩 및 에러 처리
-  if (isLoading && treeMenus.length === 0) return <Loading message={MESSAGES.LOADING} />;
-  if (error) return <ErrorMessage message={MESSAGES.ERROR_LOADING} />;
+  if (isLoading && treeMenus.length === 0) return <Loading message={t('loading')} />;
+  if (error) return <ErrorMessage message={t('errorLoading')} />;
 
   return (
     <div className="w-full">
       {/* Content Header */}
       <ContentHeader
         icon={<MenuIcon className="h-6 w-6" />}
-        title="메뉴 관리"
+        title={t('header.title')}
         actionIcon={<AddIcon className="h-4 w-4 mr-2" />}
-        actionLabel="메뉴 추가"
+        actionLabel={t('header.addMenu')}
         onAction={() => handleOpen()}
       />
 
       {/* Stats Card */}
-      <StatsCard stats={stats} statConfig={STAT_CONFIG} />
+      <StatsCard stats={stats} statConfig={statConfig} />
 
       {/* Search Filter */}
       <SearchFilter
         filters={filters}
-        fields={FILTER_FIELDS}
+        fields={filterFields}
         onFilterChange={handleFilterChange}
         onClearFilters={handleClearFilters}
       />

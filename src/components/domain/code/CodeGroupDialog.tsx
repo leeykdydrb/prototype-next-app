@@ -4,7 +4,8 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Button, FormField, FormGroup, FormSection, Input, Label, Select, SelectItem, Switch, Textarea } from "@/components/framework/form";
 import { Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader } from "@/components/framework/layout";
 import type { CodeGroupInput, CodeGroupTree, CodeGroupDialogProps } from "@/types/code-group";
-import { MESSAGES } from "@/constants/code";
+import { showError } from "@/lib/toast";
+import { useTranslations } from "next-intl";
 
 // 초기 폼 데이터 생성 함수
 const getInitialFormData = (codeGroup: CodeGroupTree | null): CodeGroupInput => {
@@ -59,6 +60,9 @@ const isFormValid = (form: CodeGroupInput) => {
 };
 
 export default function CodeGroupDialog({ open, onClose, onSubmit, codeGroup, codeGroups = [] }: CodeGroupDialogProps) {
+  const t = useTranslations("AdminCodes.dialogs.group");
+  const tConfirm = useTranslations("AdminCodes.toast");
+  const tActions = useTranslations("AdminCodes.actions");
   const [formData, setFormData] = useState<CodeGroupInput>(() => getInitialFormData(null));
   const [editingCodeGroup, setEditingCodeGroup] = useState<CodeGroupTree | null>(null);
   const isValid = useMemo(() => isFormValid(formData), [formData]);
@@ -85,7 +89,7 @@ export default function CodeGroupDialog({ open, onClose, onSubmit, codeGroup, co
 
   const handleSubmit = useCallback(() => {
     if (!isValid) {
-      alert(MESSAGES.REQUIRED_FIELDS);
+      showError(tConfirm("requiredFields"));
       return;
     }
     onSubmit({
@@ -94,67 +98,67 @@ export default function CodeGroupDialog({ open, onClose, onSubmit, codeGroup, co
       groupName: formData.groupName.trim(),
       description: formData.description?.trim() || null,
     });
-  }, [isValid, formData, onSubmit]);
+  }, [isValid, formData, onSubmit, tConfirm]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent size="xl">
         <DialogHeader
-          title={editingCodeGroup ? "코드 그룹 수정" : "코드 그룹 추가"}
-          description="코드 그룹 정보를 입력하세요. 필수 항목은 그룹 코드와 그룹명입니다."
+          title={editingCodeGroup ? t("titleEdit") : t("titleCreate")}
+          description={t("description")}
         />
         <DialogBody>
           <FormSection>
             <FormGroup columns={2} className="pb-0">
               <FormField>
-                <Label htmlFor="groupCode" required>그룹 코드</Label>
+                <Label htmlFor="groupCode" required>{t("fields.groupCode")}</Label>
                 <Input
                   id="groupCode"
                   value={formData.groupCode}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("groupCode")(e.target.value)}
                   disabled={editingCodeGroup ? true : false}
-                  placeholder="예: USER_TYPE"
+                  placeholder={t("fields.groupCodePlaceholder")}
                   className="uppercase"
                   required={formData.groupCode.trim() === ''}
                   autoFocus={!editingCodeGroup}
                 />
               </FormField>
               <FormField>
-                <Label htmlFor="groupName" required>그룹명</Label>
+                <Label htmlFor="groupName" required>{t("fields.groupName")}</Label>
                 <Input
                   id="groupName"
                   value={formData.groupName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("groupName")(e.target.value)}
                   disabled={codeGroup?.isSystem}
-                  placeholder="예: 사용자 유형"
+                  placeholder={t("fields.groupNamePlaceholder")}
                   required={formData.groupName.trim() === ''}
                 />
               </FormField>
             </FormGroup>
             <FormGroup className="pb-0">
               <FormField>
-                <Label htmlFor="description">설명</Label>
+                <Label htmlFor="description">{t("fields.description")}</Label>
                 <Textarea
                   id="description"
                   value={formData.description || ""}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange("description")(e.target.value)}
                   disabled={codeGroup?.isSystem}
-                  placeholder="코드 그룹에 대한 설명을 입력하세요"
+                  placeholder={t("fields.descriptionPlaceholder")}
                 />
               </FormField>
             </FormGroup>
             <FormGroup className="pb-0">
               <FormField>
-                <Label htmlFor="parentCodeGroup">부모 그룹</Label>
+                <Label htmlFor="parentCodeGroup">{t("fields.parentGroup")}</Label>
                 <Select
                   id="parentCodeGroup"
                   value={formData.parentId?.toString() || "none"}
                   onValueChange={(value) => handleChange("parentId")(value === "none" ? null : value)}
                   disabled={formData.isSystem}
-                  placeholder="선택 안 함"
+                  placeholder={t("fields.parentGroupPlaceholder")}
                   className="w-auto"
                 >
-                  <SelectItem value="none">선택 안 함</SelectItem>
+                  <SelectItem value="none">{t("fields.parentGroupNone")}</SelectItem>
                   {renderParentGroupOptions(codeGroups, codeGroup?.id)}
                 </Select>
               </FormField>
@@ -166,7 +170,7 @@ export default function CodeGroupDialog({ open, onClose, onSubmit, codeGroup, co
                   checked={formData.isActive}
                   onCheckedChange={(checked) => handleChange("isActive")(checked)}
                   disabled={formData.isSystem}
-                  label="활성화"
+                  label={t("fields.isActiveLabel")}
                 />
               </FormField>
             </FormGroup>
@@ -175,10 +179,10 @@ export default function CodeGroupDialog({ open, onClose, onSubmit, codeGroup, co
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            취소
+            {tActions("cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!isValid}>
-            {editingCodeGroup ? "수정" : "추가"}
+            {editingCodeGroup ? tActions("edit") : tActions("add")}
           </Button>
         </DialogFooter>
       </DialogContent>

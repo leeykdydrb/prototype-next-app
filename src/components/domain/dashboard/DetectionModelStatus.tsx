@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader } from '@/components/framework/layout';
 import { Badge } from '@/components/framework/data-display';
 import { CheckCircle, ChevronRight } from 'lucide-react';
@@ -17,19 +18,21 @@ interface DetectionModelStatusProps {
 }
 
 export default function DetectionModelStatus({ data }: DetectionModelStatusProps) {
+  const t = useTranslations('Dashboard.detection');
+
   return (
     <Card className="py-2 gap-2">
-      <CardHeader title="검출 모델 상태" titleSize="lg" />
+      <CardHeader title={t('title')} titleSize="lg" />
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-2 px-4 font-medium text-gray-700">Status</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">모델 이름</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">FPS</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">추론 시간(ms)</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">신뢰도 점수(%)</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colStatus')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colModelName')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colFps')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colInferenceMs')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colConfidence')}</th>
               </tr>
             </thead>
             <tbody>

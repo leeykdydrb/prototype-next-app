@@ -1,7 +1,8 @@
-"use client"
+"use client";
 
 import React, { useState, useMemo, useCallback } from "react";
 import { Plus as AddIcon, Shield as SecurityIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import ContentHeader from "@/components/common/ContentHeader";
 import StatsCard from "@/components/common/StatsCard";
@@ -18,7 +19,7 @@ import {
 import { usePermissionStats } from "@/hooks/permission/usePermissionStats";
 import { usePermissionFilters } from "@/hooks/permission/usePermissionFilters";
 
-import { MESSAGES, STAT_CONFIG } from '@/constants/permission';
+import { STAT_CONFIG } from '@/constants/permission';
 import { showSuccess } from "@/lib/toast";
 import type { PermissionData, PermissionInput } from "@/types/permission";
 
@@ -26,7 +27,10 @@ import PermissionDialog from "./PermissionDialog";
 import PermissionList from "./PermissionList";
 
 export default function PermissionForm() {
-  console.log("PermissionForm")
+  console.log("PermissionForm");
+  const t = useTranslations("AdminPermissions");
+  const tToast = useTranslations("AdminPermissions.toast");
+
   // 상태 관리
   const [dialogOpen, setDialogOpen] = useState(false); // 권한 추가/수정 다이얼로그 열기/닫기
   const [editingPermission, setEditingPermission] = useState<PermissionData | null>(null); // 수정할 권한 정보
@@ -52,6 +56,15 @@ export default function PermissionForm() {
 
   // 통계 정보
   const stats = usePermissionStats(permissions);
+  const statConfig = useMemo(
+    () =>
+      STAT_CONFIG.map(({ key, color }) => ({
+        key,
+        color,
+        label: t(`stats.${key}`),
+      })),
+    [t],
+  );
 
   // 카테고리별로 그룹화된 권한 목록
   const groupedPermissions = useMemo(() => {
@@ -116,20 +129,20 @@ export default function PermissionForm() {
     const mutationOption = {
       onSuccess: () => {
         handleClose();
-        showSuccess(editingPermission ? MESSAGES.PERMISSION_UPDATE_SUCCESS : MESSAGES.PERMISSION_CREATE_SUCCESS);
+        showSuccess(editingPermission ? tToast('updateSuccess') : tToast('createSuccess'));
       }
     };
 
     if (editingPermission) updateMutation.mutate({ id: editingPermission.id, ...submitData }, mutationOption);
     else createMutation.mutate(submitData, mutationOption);
-  }, [editingPermission, updateMutation, createMutation, handleClose]);
+  }, [editingPermission, updateMutation, createMutation, handleClose, tToast]);
 
   // 권한 삭제 요청 처리
   const handleDelete = useCallback((permission: PermissionData) => {
     deleteMutation.mutate({ id: permission.id }, {
-      onSuccess: () => showSuccess(MESSAGES.PERMISSION_DELETE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('deleteSuccess'))
     });
-  }, [deleteMutation]);
+  }, [deleteMutation, tToast]);
 
   // 권한 상태 변경 요청 처리
   const handleToggle = useCallback((permission: PermissionData) => {
@@ -138,27 +151,27 @@ export default function PermissionForm() {
       id: permission.id,
       isActive: !permission.isActive
     }, {
-      onSuccess: () => showSuccess(MESSAGES.PERMISSION_TOGGLE_SUCCESS)
+      onSuccess: () => showSuccess(tToast('toggleSuccess'))
     });
-  }, [updateMutation]);
+  }, [updateMutation, tToast]);
 
   // 로딩 및 에러 처리
-  if (isLoading && permissions.length === 0) return <Loading message={MESSAGES.LOADING} />;  
-  if (error) return <ErrorMessage message={MESSAGES.ERROR_LOADING} />;
+  if (isLoading && permissions.length === 0) return <Loading message={t('loading')} />;  
+  if (error) return <ErrorMessage message={t('errorLoading')} />;
 
   return (
     <div className="w-full">
       {/* 컨텐츠 헤더 */}
       <ContentHeader
         icon={<SecurityIcon className="h-6 w-6" />}
-        title="권한 관리"
+        title={t('header.title')}
         actionIcon={<AddIcon className="h-4 w-4 mr-2" />}
-        actionLabel="권한 추가"
+        actionLabel={t('header.addPermission')}
         onAction={() => handleOpen()}
       />
 
       {/* 통계 카드 */}
-      <StatsCard stats={stats} statConfig={STAT_CONFIG} />
+      <StatsCard stats={stats} statConfig={statConfig} />
 
       {/* 검색 및 필터 */}
       <SearchFilter

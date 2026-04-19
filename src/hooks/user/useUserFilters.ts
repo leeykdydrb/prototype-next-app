@@ -2,11 +2,14 @@
 // 사용자 검색 및 필터링 훅
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRoleQuery } from '@/hooks/role/useRoleQuery';
 import type { UserSearchParams, UserSearchFilters } from '@/types/user';
 import type { FilterField } from "@/components/common/SearchFilter";
 
 export const useUserFilters = () => {
+  const tf = useTranslations('AdminUsers.filters');
+
   const [filters, setFilters] = useState<UserSearchFilters>({
     search: '',
     roleId: 'all',
@@ -19,36 +22,40 @@ export const useUserFilters = () => {
   const { data: roles = [] } = useRoleQuery();
 
   // 필터 필드 동적 생성
-  const filterFields = useMemo(() => [
-    {
-      type: "search",
-      key: "search",
-      id: "user-search",
-      placeholder: "아이디, 사용자명, 이메일로 검색...",
-    },
-    {
-      type: "select",
-      key: "roleId",
-      label: "역할",
-      options: [
-        { value: "all", label: "전체" },
-        ...roles.map(role => ({
-          value: String(role.id),
-          label: role.displayName
-        }))
-      ],
-    },
-    {
-      type: "select",
-      key: "isActive",
-      label: "상태",
-      options: [
-        { value: "all", label: "전체" },
-        { value: "true", label: "활성" },
-        { value: "false", label: "비활성" },
-      ],
-    },
-  ] satisfies FilterField<UserSearchFilters>[], [roles]);
+  const filterFields = useMemo(
+    () =>
+      [
+        {
+          type: 'search' as const,
+          key: 'search' as const,
+          id: 'user-search',
+          placeholder: tf('searchPlaceholder'),
+        },
+        {
+          type: 'select' as const,
+          key: 'roleId' as const,
+          label: tf('role'),
+          options: [
+            { value: 'all', label: tf('all') },
+            ...roles.map((role) => ({
+              value: String(role.id),
+              label: role.displayName,
+            })),
+          ],
+        },
+        {
+          type: 'select' as const,
+          key: 'isActive' as const,
+          label: tf('status'),
+          options: [
+            { value: 'all', label: tf('all') },
+            { value: 'true', label: tf('active') },
+            { value: 'false', label: tf('inactive') },
+          ],
+        },
+      ] satisfies FilterField<UserSearchFilters>[],
+    [roles, tf],
+  );
 
   const searchParams = useMemo((): UserSearchParams => {
     const params: UserSearchParams = {};

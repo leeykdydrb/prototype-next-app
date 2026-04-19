@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/framework/form";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/framework/data-display";
 import { Card, CardHeader, CardContent } from "@/components/framework/layout";
@@ -20,7 +21,7 @@ import { AlertTriangle as WarningIcon, ChevronDownIcon, ColumnsIcon } from "luci
 import type { RoleListProps, RoleData } from "@/types/role";
 import TablePagination from "@/components/common/TablePagination";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import { createRoleColumns, columnHeaders } from "./table/columns";
+import { createRoleColumns, type RoleColumnId } from "./table/columns";
 
 const RoleListNew = React.memo(function RoleListNew({
   roles,
@@ -33,6 +34,24 @@ const RoleListNew = React.memo(function RoleListNew({
   onRowsPerPageChange,
   totalCount,
 }: RoleListProps) {
+  const tList = useTranslations("AdminRoles.list");
+  const tCols = useTranslations("AdminRoles.list.columns");
+
+  const labels = useMemo(
+    () =>
+      ({
+        name: tCols("name"),
+        displayName: tCols("displayName"),
+        description: tCols("description"),
+        permissionCount: tCols("permissionCount"),
+        userCount: tCols("userCount"),
+        isSystem: tCols("isSystem"),
+        isActive: tCols("isActive"),
+        actions: tCols("actions"),
+      }) satisfies Record<RoleColumnId, string>,
+    [tCols],
+  );
+
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     role: RoleData | null;
@@ -65,8 +84,16 @@ const RoleListNew = React.memo(function RoleListNew({
 
   // 컬럼 정의
   const columns = useMemo(() => (
-    createRoleColumns({ onEdit, onToggle, onDeleteClick: handleDeleteClick })
-  ), [onEdit, onToggle, handleDeleteClick]);
+    createRoleColumns({
+      onEdit,
+      onToggle,
+      onDeleteClick: handleDeleteClick,
+      labels,
+      systemBadge: tList("systemBadge"),
+      permissionCountSuffix: tList("permissionCountSuffix"),
+      userCountSuffix: tList("userCountSuffix"),
+    })
+  ), [onEdit, onToggle, handleDeleteClick, labels, tList]);
 
   // TanStack Table 설정
   const table = useReactTable({
@@ -103,14 +130,14 @@ const RoleListNew = React.memo(function RoleListNew({
   return (
     <>
       <Card className="py-4">
-        <CardHeader title="역할 목록">
+        <CardHeader title={tList("cardTitle")}>
           <div className="flex items-center gap-2">
             <DropdownMenuComponents.Root>
               <DropdownMenuComponents.Trigger asChild>
                 <Button variant="outline" size="sm">
                   <ColumnsIcon />
-                  <span className="hidden lg:inline">컬럼 설정</span>
-                  <span className="lg:hidden">컬럼</span>
+                  <span className="hidden lg:inline">{tList("columnSettings")}</span>
+                  <span className="lg:hidden">{tList("columnSettingsShort")}</span>
                   <ChevronDownIcon />
                 </Button>
               </DropdownMenuComponents.Trigger>
@@ -125,7 +152,7 @@ const RoleListNew = React.memo(function RoleListNew({
                       checked={column.getIsVisible()}
                       onCheckedChange={(value) => column.toggleVisibility(!!value)}
                     >
-                      {columnHeaders[column.id] || column.id}
+                      {(labels as Record<string, string>)[column.id] || column.id}
                     </DropdownMenuComponents.CheckboxItem>
                   ))}
               </DropdownMenuComponents.Content>
@@ -141,7 +168,7 @@ const RoleListNew = React.memo(function RoleListNew({
                   {headerGroup.headers.map((header) => (
                     <TableHead 
                       key={header.id}
-                      className="data-[name=name]:w-30 data-[name=displayName]:w-20 data-[name=description]:w-50 data-[name=permissionCount]:w-24 data-[name=userCount]:w-24 data-[name=isSystem]:w-24 data-[name=isActive]:w-24 data-[name=actions]:w-20 data-[name=name]:text-left data-[name=displayName]:text-left data-[name=description]:text-left data-[name=permissionCount]:text-center data-[name=userCount]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
+                      className="data-[name=name]:w-30 data-[name=displayName]:w-20 data-[name=description]:w-50 data-[name=permissionCount]:w-24 data-[name=userCount]:w-24 data-[name=isSystem]:w-24 data-[name=isActive]:w-24 data-[name=actions]:w-20 data-[name=name]:text-center data-[name=displayName]:text-center data-[name=description]:text-left data-[name=permissionCount]:text-center data-[name=userCount]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
                       data-name={header.id}
                     >
                       {header.isPlaceholder
@@ -156,19 +183,27 @@ const RoleListNew = React.memo(function RoleListNew({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell 
-                      key={cell.id}
-                      className="data-[name=name]:w-30 data-[name=displayName]:w-20 data-[name=description]:w-50 data-[name=permissionCount]:w-24 data-[name=userCount]:w-24 data-[name=isSystem]:w-24 data-[name=isActive]:w-24 data-[name=actions]:w-20 data-[name=name]:text-left data-[name=displayName]:text-left data-[name=description]:text-left data-[name=permissionCount]:text-center data-[name=userCount]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
-                      data-name={cell.column.id}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+              {table.getRowModel().rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    {tList("empty")}
+                  </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell 
+                        key={cell.id}
+                        className="data-[name=name]:w-30 data-[name=displayName]:w-20 data-[name=description]:w-50 data-[name=permissionCount]:w-24 data-[name=userCount]:w-24 data-[name=isSystem]:w-24 data-[name=isActive]:w-24 data-[name=actions]:w-20 data-[name=name]:text-left data-[name=displayName]:text-left data-[name=description]:text-left data-[name=permissionCount]:text-center data-[name=userCount]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
+                        data-name={cell.column.id}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
 
@@ -181,21 +216,15 @@ const RoleListNew = React.memo(function RoleListNew({
         open={deleteDialog.open}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="역할 삭제"
+        title={tList("deleteDialogTitle")}
         content={
-          <>
-            <p>
-              <span className="font-bold">
-                {deleteDialog.role?.displayName}
-              </span>
-              {" 역할을 삭제하시겠습니까?"}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              이 작업은 되돌릴 수 없습니다.
-            </p>
-          </>
+          <div className="space-y-2">
+            <p>{tList("deleteConfirm", { name: deleteDialog.role?.displayName ?? "" })}</p>
+            <p className="text-sm text-muted-foreground">{tList("deleteIrreversible")}</p>
+          </div>
         }
-        confirmText="삭제"
+        confirmText={tList("deleteConfirmButton")}
+        cancelText={tList("cancel")}
         confirmButtonColor="destructive"
         icon={<WarningIcon className="text-warning" />}
       />

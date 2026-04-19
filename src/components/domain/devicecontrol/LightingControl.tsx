@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/framework/layout';
 import { Button, FormField, FormGroup, Label, Select, SelectItem } from '@/components/framework/form';
 import { Check, X } from 'lucide-react';
@@ -19,6 +20,8 @@ interface LightingControlProps {
 }
 
 export default function LightingControl({ settings, onApply, onCancel }: LightingControlProps) {
+  const t = useTranslations('DeviceControl.lighting');
+  const tActions = useTranslations('DeviceControl.actions');
   const [lightingSettings, setLightingSettings] = useState<LightingSettings>(settings);
 
   // 외부에서 설정값이 변경되면 내부 상태도 업데이트
@@ -38,30 +41,25 @@ export default function LightingControl({ settings, onApply, onCancel }: Lightin
   };
 
   const handleCancel = () => {
-    setLightingSettings({
-      channel1: 255,
-      channel2: 255,
-      channel3: 255,
-      channel4: 255
-    });
+    setLightingSettings(settings);
     onCancel();
   };
 
   return (
     <Card className="py-2 gap-2 h-full flex flex-col">
-      <CardHeader title="조명 제어" titleSize="lg" />
+      <CardHeader title={t('title')} titleSize="lg" />
       <CardContent className="flex-1 flex flex-col">
         <Tabs defaultValue="light" className="w-full flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-1">
             <TabsTrigger value="light" className="data-[state=active]:bg-gray-400 data-[state=active]:text-white">
-              Light
+              {t('tabLight')}
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="light" className="flex-1 flex flex-col space-y-4">
             <FormGroup columns={2}>
               <FormField>
-                <Label htmlFor="channel1">채널1 밝기</Label>
+                <Label htmlFor="channel1">{t('channel1')}</Label>
                 <Select 
                   value={lightingSettings.channel1.toString()} 
                   onValueChange={(value) => handleSettingChange('channel1', value)}
@@ -72,7 +70,7 @@ export default function LightingControl({ settings, onApply, onCancel }: Lightin
                 </Select>
               </FormField>
               <FormField>
-                <Label htmlFor="channel2">채널2 밝기</Label>
+                <Label htmlFor="channel2">{t('channel2')}</Label>
                 <Select 
                   value={lightingSettings.channel2.toString()} 
                   onValueChange={(value) => handleSettingChange('channel2', value)}
@@ -83,7 +81,7 @@ export default function LightingControl({ settings, onApply, onCancel }: Lightin
                 </Select>
               </FormField>
               <FormField>
-                <Label htmlFor="channel3">채널3 밝기</Label>
+                <Label htmlFor="channel3">{t('channel3')}</Label>
                 <Select 
                   value={lightingSettings.channel3.toString()} 
                   onValueChange={(value) => handleSettingChange('channel3', value)}
@@ -94,7 +92,7 @@ export default function LightingControl({ settings, onApply, onCancel }: Lightin
                 </Select>
               </FormField>
               <FormField>
-                <Label htmlFor="channel4">채널4 밝기</Label>
+                <Label htmlFor="channel4">{t('channel4')}</Label>
                 <Select 
                   value={lightingSettings.channel4.toString()} 
                   onValueChange={(value) => handleSettingChange('channel4', value)}
@@ -111,14 +109,14 @@ export default function LightingControl({ settings, onApply, onCancel }: Lightin
                 className="bg-gray-600 hover:bg-gray-700 cursor-pointer"
               >
                 <Check className="h-4 w-4 mr-2" />
-                Apply
+                {tActions('apply')}
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={handleCancel}
               >
                 <X className="h-4 w-4 mr-2" />
-                Cancel
+                {tActions('cancel')}
               </Button>
             </div>
           </TabsContent>

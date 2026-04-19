@@ -1,9 +1,12 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { useCodeQuery } from '@/hooks/code/useCodeQuery';
 import type { PermissionSearchFilters } from '@/types/permission';
 import type { FilterField } from "@/components/common/SearchFilter";
 
 export const usePermissionFilters = () => {
+  const tf = useTranslations('AdminPermissions.filters');
+
   const [filters, setFilters] = useState<PermissionSearchFilters>({
     search: '',
     categoryId: 'all',
@@ -20,14 +23,14 @@ export const usePermissionFilters = () => {
       type: "search",
       key: "search",
       id: "permission-search",
-      placeholder: "권한명, 표시명, 설명으로 검색...",
+      placeholder: tf('searchPlaceholder'),
     },
     {
       type: "select",
       key: "categoryId",
-      label: "카테고리",
+      label: tf('category'),
       options: [
-        { value: "all", label: "전체" },
+        { value: "all", label: tf('all') },
         ...categories.map(category => ({
           value: String(category.id),
           label: category.codeName
@@ -37,14 +40,14 @@ export const usePermissionFilters = () => {
     {
       type: "select",
       key: "isActive",
-      label: "상태",
+      label: tf('status'),
       options: [
-        { value: "all", label: "전체" },
-        { value: "true", label: "활성" },
-        { value: "false", label: "비활성" },
+        { value: "all", label: tf('all') },
+        { value: "true", label: tf('active') },
+        { value: "false", label: tf('inactive') },
       ],
     },
-  ] satisfies FilterField<PermissionSearchFilters>[], [categories]);
+  ] satisfies FilterField<PermissionSearchFilters>[], [categories, tf]);
 
   const searchParams = useMemo(() => ({
     ...(filters.search && { search: filters.search }),

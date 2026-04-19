@@ -23,6 +23,21 @@ vi.mock('@/utils/buildMenuTree', () => ({
   buildMenuTree: vi.fn((menus) => menus),
 }));
 
+vi.mock('next-intl', () => ({
+  useTranslations: () => (key: string) =>
+    key === 'loading' ? '로딩중...' : key,
+}));
+
+vi.mock('@/components/layout/Header/AppHeader', () => ({
+  default: ({ title }: { title?: string }) => (
+    <header data-testid="app-header">{title}</header>
+  ),
+}));
+
+vi.mock('@/components/layout/Sidebar/AppSidebar', () => ({
+  default: () => <aside data-testid="app-sidebar" />,
+}));
+
 import { useMenuQuery } from '@/hooks/menu/useMenuQuery';
 import { useMenuStore } from '@/store/menuStore';
 import { buildMenuTree } from '@/utils/buildMenuTree';
@@ -33,6 +48,7 @@ describe('AppLayout', () => {
     {
       id: 1,
       title: 'Dashboard',
+      titleKey: 'NavMenu.dashboard',
       path: '/dashboard',
       icon: 'Dashboard',
       order: 1,
@@ -99,7 +115,7 @@ describe('AppLayout', () => {
     });
 
     expect(screen.getByText('Test Content')).toBeDefined();
-    expect(screen.getByText('PROTOTYPE SOLUTION SYSTEM')).toBeDefined();
+    expect(screen.getByText('MICUBE SOLUTION SYSTEM')).toBeDefined();
   });
 
   /**

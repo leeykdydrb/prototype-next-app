@@ -6,27 +6,34 @@ import { ArrowUpDown, Edit, Trash2 as DeleteIcon } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { RoleData } from "@/types/role";
 
-export const columnHeaders: Record<string, string> = {
-  name: "역할명",
-  displayName: "표시명",
-  description: "설명",
-  permissionCount: "권한 수",
-  userCount: "사용자 수",
-  isSystem: "시스템 역할",
-  isActive: "상태",
-  actions: "작업",
-};
+export type RoleColumnId =
+  | "name"
+  | "displayName"
+  | "description"
+  | "permissionCount"
+  | "userCount"
+  | "isSystem"
+  | "isActive"
+  | "actions";
 
 export interface CreateRoleColumnsDeps {
   onEdit: (role: RoleData) => void;
   onToggle: (role: RoleData) => void;
   onDeleteClick: (role: RoleData) => void;
+  labels: Record<RoleColumnId, string>;
+  systemBadge: string;
+  permissionCountSuffix: string;
+  userCountSuffix: string;
 }
 
 export function createRoleColumns({
   onEdit,
   onToggle,
   onDeleteClick,
+  labels,
+  systemBadge,
+  permissionCountSuffix,
+  userCountSuffix,
 }: CreateRoleColumnsDeps): ColumnDef<RoleData>[] {
   return [
     {
@@ -38,12 +45,14 @@ export function createRoleColumns({
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-8 px-2 lg:px-3"
         >
-          {columnHeaders.name}
+          {labels.name}
           <ArrowUpDown />
         </Button>
       ),
       cell: ({ row }) => (
-        <span className="text-sm font-semibold">{row.getValue("name")}</span>
+        <div className="text-center">
+          <span className="text-sm font-semibold">{row.getValue("name")}</span>
+        </div>
       ),
     },
     {
@@ -53,18 +62,21 @@ export function createRoleColumns({
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="h-8 px-2 lg:px-3"
+          className="h-8 px-2 lg:px-3 text-center"
         >
-          {columnHeaders.displayName}
+          {labels.displayName}
           <ArrowUpDown />
         </Button>
       ),
-      cell: ({ row }) => row.getValue("displayName") as React.ReactNode,
+      // cell: ({ row }) => row.getValue("displayName") as React.ReactNode,
+      cell: ({ row }) => (
+        <div className="text-center">{row.getValue("displayName")}</div>
+      ),
     },
     {
       id: "description",
       accessorKey: "description",
-      header: columnHeaders.description,
+      header: labels.description,
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
           {row.getValue("description")}
@@ -80,14 +92,15 @@ export function createRoleColumns({
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-8 px-2 lg:px-3"
         >
-          {columnHeaders.permissionCount}
+          {labels.permissionCount}
           <ArrowUpDown />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="text-center">
           <Badge variant="outline" className="text-xs">
-            {row.original.rolePermissions?.length || 0}개
+            {row.original.rolePermissions?.length || 0}
+            {permissionCountSuffix}
           </Badge>
         </div>
       ),
@@ -106,14 +119,15 @@ export function createRoleColumns({
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="h-8 px-2 lg:px-3"
         >
-          {columnHeaders.userCount}
+          {labels.userCount}
           <ArrowUpDown />
         </Button>
       ),
       cell: ({ row }) => (
         <div className="text-center">
           <Badge variant="default" className="text-xs">
-            {row.original._count?.users || 0}명
+            {row.original._count?.users || 0}
+            {userCountSuffix}
           </Badge>
         </div>
       ),
@@ -126,12 +140,12 @@ export function createRoleColumns({
     {
       id: "isSystem",
       accessorKey: "isSystem",
-      header: columnHeaders.isSystem,
+      header: labels.isSystem,
       cell: ({ row }) => (
         <div>
           {row.getValue("isSystem") ? (
             <Badge variant="secondary" className="text-xs">
-              시스템
+              {systemBadge}
             </Badge>
           ) : null}
         </div>
@@ -140,7 +154,7 @@ export function createRoleColumns({
     {
       id: "isActive",
       accessorKey: "isActive",
-      header: columnHeaders.isActive,
+      header: labels.isActive,
       cell: ({ row }) => (
         <Switch
           checked={row.getValue("isActive")}
@@ -151,7 +165,7 @@ export function createRoleColumns({
     },
     {
       id: "actions",
-      header: columnHeaders.actions,
+      header: labels.actions,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
           <Button

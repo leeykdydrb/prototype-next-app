@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { useNavMenuTitle } from "@/hooks/menu/useNavMenuTitle";
 import type { MenuTree } from "@/types/menu";
 import { cn } from "@/lib/utils";
 import { SidebarMenuItem, SidebarMenuButton, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem } from "@/components/framework/layout";
@@ -45,6 +46,7 @@ export default function SidebarItem({
 }: SidebarItemProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const navTitle = useNavMenuTitle();
   const [open, setOpen] = useState(false);
 
   const hasChildren = Boolean(item.children?.length);
@@ -73,7 +75,9 @@ export default function SidebarItem({
               isActive={isActive || isParentActive}
             >
               <Icon />
-              <span className="flex-1 text-left group-data-[collapsible=icon]:hidden">{item.title}</span>
+              <span className="flex-1 text-left group-data-[collapsible=icon]:hidden">
+                {navTitle(item)}
+              </span>
               <ChevronRight className={cn(
                 "ml-auto h-4 w-4 transition-transform group-data-[collapsible=icon]:hidden",
                 open && "rotate-90"
@@ -89,7 +93,7 @@ export default function SidebarItem({
                     isActive={pathname === child.path}
                     onClick={() => child.path && handleItemClick(child.path)}
                   >
-                    <span>{child.title}</span>
+                    <span>{navTitle(child)}</span>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               ))}
@@ -104,7 +108,7 @@ export default function SidebarItem({
     <SidebarMenuItem>
       <SidebarMenuButton isActive={isActive} onClick={() => item.path && handleItemClick(item.path)}>
         <Icon />
-        <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
+        <span className="group-data-[collapsible=icon]:hidden">{navTitle(item)}</span>
       </SidebarMenuButton>
     </SidebarMenuItem>
   );

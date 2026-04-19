@@ -1,0 +1,628 @@
+{
+  "Common": {
+    "loading": "Loading...",
+    "checkingRole": "Checking your session...",
+    "searchFilter": {
+      "clearFilters": "Clear filters"
+    },
+    "formDialog": {
+      "required": "{label} is required.",
+      "invalid": "{label} is invalid.",
+      "invalidEmail": "Invalid email address.",
+      "invalidNumber": "Invalid number.",
+      "selectPlaceholder": "Select...",
+      "submitDefault": "Save",
+      "cancelDefault": "Cancel"
+    },
+    "tablePagination": {
+      "rowsPerPage": "Rows per page",
+      "pageOf": "Page {current} of {total}",
+      "rangeSummary": "{start}-{end} of {total}",
+      "selectedSummary": "{selected} of {total} row(s) selected",
+      "srFirst": "Go to first page",
+      "srPrevious": "Go to previous page",
+      "srNext": "Go to next page",
+      "srLast": "Go to last page"
+    }
+  },
+  "ProfileMenu": {
+    "aria": "User menu",
+    "anonymous": "User",
+    "signOut": "Sign out"
+  },
+  "Metadata": {
+    "title": "Prototype",
+    "description": "Development Framework"
+  },
+  "NavMenu": {
+    "dashboard": "Dashboard",
+    "equipment": "Equipment",
+    "equipmentList": "Equipment list",
+    "equipmentNew": "Register equipment",
+    "reports": "Reports",
+    "settings": "Settings",
+    "system": "System administration",
+    "adminUsers": "User management",
+    "adminCodes": "Code management",
+    "adminPermissions": "Permission management",
+    "adminRoles": "Role management",
+    "adminMenus": "Menu management",
+    "deviceControl": "Device control",
+    "devices": "Devices"
+  },
+  "LocaleMenu": {
+    "aria": "Language",
+    "menuTitle": "Language",
+    "lang": {
+      "ko": "한국어",
+      "en": "English"
+    }
+  },
+  "Dashboard": {
+    "status": {
+      "ok": "Normal"
+    },
+    "mock": {
+      "modelA": "Inspection model A",
+      "modelB": "Inspection model B",
+      "modelC": "Inspection model C",
+      "modelD": "Inspection model D",
+      "light1": "Light 1"
+    },
+    "onDeviceList": {
+      "title": "On-device list",
+      "colStatus": "Status",
+      "colDeviceId": "Device ID",
+      "colIp": "IP"
+    },
+    "detection": {
+      "title": "Detection model status",
+      "colStatus": "Status",
+      "colModelName": "Model name",
+      "colFps": "FPS",
+      "colInferenceMs": "Inference time (ms)",
+      "colConfidence": "Confidence (%)"
+    },
+    "camera": {
+      "title": "Cameras",
+      "colStatus": "Status",
+      "colCameraId": "Camera ID",
+      "colPing": "Ping",
+      "colFrameRate": "Frame rate",
+      "colThroughput": "Throughput (Mbps)"
+    },
+    "lighting": {
+      "title": "Lighting",
+      "colStatus": "Status",
+      "colLightId": "Light ID",
+      "colPing": "Ping",
+      "colBrightness": "Brightness"
+    },
+    "graphs": {
+      "cpuTemp": "CPU temperature",
+      "gpuTemp": "GPU temperature",
+      "cpuUsage": "CPU usage",
+      "memoryUsage": "Memory usage",
+      "diskUsage": "Disk usage",
+      "seriesA": "Series A",
+      "seriesB": "Series B"
+    }
+  },
+  "DeviceControl": {
+    "actions": {
+      "apply": "Apply",
+      "cancel": "Cancel"
+    },
+    "onDeviceList": {
+      "title": "On-device list",
+      "colDeviceId": "Device ID",
+      "colProcess": "Process"
+    },
+    "camera": {
+      "title": "Camera control",
+      "tabLeft": "Cam_Left",
+      "tabRight": "Cam_Right",
+      "exposure": "Exposure (ms)",
+      "gain": "Gain (dB)"
+    },
+    "lighting": {
+      "title": "Lighting control",
+      "tabLight": "Lighting",
+      "channel1": "Channel 1 brightness",
+      "channel2": "Channel 2 brightness",
+      "channel3": "Channel 3 brightness",
+      "channel4": "Channel 4 brightness"
+    },
+    "appliedValues": {
+      "title": "Applied control values",
+      "exposureLine": "Exposure: {value}",
+      "gainLine": "Gain: {value}",
+      "channelBrightnessLine": "Channel {channel} brightness: {value}"
+    }
+  },
+  "AdminUsers": {
+    "header": {
+      "title": "User management",
+      "addUser": "Add user"
+    },
+    "stats": {
+      "total": "Total users",
+      "active": "Active users",
+      "inactive": "Inactive users",
+      "system": "System users"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by ID, Username, or Email...",
+      "role": "Role",
+      "status": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "toast": {
+      "createSuccess": "User created successfully.",
+      "updateSuccess": "User updated successfully.",
+      "deleteSuccess": "User deleted successfully.",
+      "toggleSuccess": "User status was updated.",
+      "requiredFields": "Please fill in all required fields."
+    },
+    "loading": "Loading users...",
+    "errorLoading": "Failed to load users.",
+    "list": {
+      "cardTitle": "User list",
+      "columnSettings": "Column settings",
+      "columnSettingsShort": "Columns",
+      "columns": {
+        "id": "ID",
+        "name": "Username",
+        "email": "Email",
+        "role": "Role",
+        "isSystem": "System user",
+        "isActive": "Status"
+      },
+      "systemBadge": "System",
+      "empty": "No data.",
+      "actionsMenu": "Actions",
+      "editUser": "Edit user",
+      "deleteUser": "Delete user",
+      "deleteDialogTitle": "Delete user",
+      "deleteConfirm": "Delete user {name}?",
+      "deleteIrreversible": "This action cannot be undone.",
+      "deleteConfirmButton": "Delete",
+      "cancel": "Cancel",
+      "selectAllAria": "Select all",
+      "selectRowAria": "Select row"
+    },
+    "dialog": {
+      "titleCreate": "Add user",
+      "titleEdit": "Edit user",
+      "description": "Enter user details and assign permissions.",
+      "submitCreate": "Add",
+      "submitEdit": "Save",
+      "cancel": "Cancel",
+      "fields": {
+        "id": "User ID",
+        "password": "Password",
+        "passwordHelpEdit": "Leave blank to keep the current password.",
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "isActive": "Active",
+        "isSystem": "System user"
+      },
+      "permissionsSection": "Permissions",
+      "permissionsWarningLead": "Note:",
+      "permissionsWarningBody": "Selected permissions are applied directly, regardless of the user’s role. Choose carefully."
+    }
+  },
+  "AdminRoles": {
+    "header": {
+      "title": "Role management",
+      "addRole": "Add role"
+    },
+    "stats": {
+      "total": "Total roles",
+      "active": "Active roles",
+      "inactive": "Inactive roles",
+      "system": "System roles"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by Role name, Display name, or Description...",
+      "status": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "toast": {
+      "createSuccess": "Role created successfully.",
+      "updateSuccess": "Role updated successfully.",
+      "deleteSuccess": "Role deleted successfully.",
+      "toggleSuccess": "Role status was updated.",
+      "requiredFields": "Please fill in all required fields."
+    },
+    "loading": "Loading roles...",
+    "errorLoading": "Failed to load roles.",
+    "list": {
+      "cardTitle": "Role list",
+      "columnSettings": "Column settings",
+      "columnSettingsShort": "Columns",
+      "columns": {
+        "name": "Role name",
+        "displayName": "Display name",
+        "description": "Description",
+        "permissionCount": "Permissions",
+        "userCount": "Users",
+        "isSystem": "System role",
+        "isActive": "Status",
+        "actions": "Actions"
+      },
+      "permissionCountSuffix": "",
+      "userCountSuffix": "people",
+      "systemBadge": "System",
+      "empty": "No data.",
+      "deleteDialogTitle": "Delete role",
+      "deleteConfirm": "Delete role {name}?",
+      "deleteIrreversible": "This action cannot be undone.",
+      "deleteConfirmButton": "Delete",
+      "cancel": "Cancel"
+    },
+    "dialog": {
+      "titleCreate": "Add role",
+      "titleEdit": "Edit role",
+      "description": "Enter role details and select permissions. Required: role name, display name, and permissions.",
+      "cancel": "Cancel",
+      "submitCreate": "Add",
+      "submitEdit": "Save",
+      "fields": {
+        "name": "Role name",
+        "nameHelp": "Use uppercase letters",
+        "namePlaceholder": "e.g. MANAGER",
+        "displayName": "Display name",
+        "displayNameHelp": "Shown to users",
+        "displayNamePlaceholder": "e.g. Manager",
+        "description": "Description",
+        "descriptionHelp": "Describe the role",
+        "descriptionPlaceholder": "e.g. User management permissions",
+        "permissions": "Select permissions"
+      }
+    }
+  },
+  "AdminMenus": {
+    "header": {
+      "title": "Menu management",
+      "addMenu": "Add menu"
+    },
+    "stats": {
+      "total": "Total menus",
+      "active": "Active menus",
+      "inactive": "Inactive menus",
+      "system": "System menus"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by Menu title or Path...",
+      "status": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "toast": {
+      "createSuccess": "Menu created successfully.",
+      "updateSuccess": "Menu updated successfully.",
+      "deleteSuccess": "Menu deleted successfully.",
+      "toggleSuccess": "Menu status was updated.",
+      "requiredFields": "Please fill in all required fields."
+    },
+    "loading": "Loading menus...",
+    "errorLoading": "Failed to load menus.",
+    "list": {
+      "cardTitle": "Menu list",
+      "columnSettings": "Column settings",
+      "columnSettingsShort": "Columns",
+      "columns": {
+        "menuName": "Menu",
+        "path": "Path",
+        "icon": "Icon",
+        "order": "Order",
+        "isSystem": "System menu",
+        "isActive": "Status",
+        "actions": "Actions"
+      },
+      "systemBadge": "System",
+      "empty": "No data.",
+      "deleteDialogTitle": "Delete menu",
+      "deleteConfirm": "Delete menu {name}?",
+      "deleteIrreversible": "This action cannot be undone.",
+      "deleteConfirmButton": "Delete",
+      "cancel": "Cancel"
+    },
+    "dialog": {
+      "titleCreate": "Add menu",
+      "titleEdit": "Edit menu",
+      "description": "Enter menu details and select permissions. Required: menu title, title key, and permissions.",
+      "cancel": "Cancel",
+      "submitCreate": "Add",
+      "submitEdit": "Save",
+      "fields": {
+        "title": "Menu title",
+        "titleHelp": "Shown to users",
+        "titlePlaceholder": "e.g. Dashboard",
+        "titleKey": "Title key",
+        "titleKeyHelp": "i18n key. If missing in translation files, the menu title is shown as-is.",
+        "titleKeyPlaceholder": "e.g. NavMenu.dashboard",
+        "path": "Path",
+        "pathHelp": "Enter the menu route path",
+        "pathOptionalSuffix": "(optional)",
+        "pathPlaceholder": "e.g. /dashboard, /admin/users",
+        "icon": "Icon",
+        "iconHelp": "Select an icon to show in the menu",
+        "iconPlaceholder": "Select icon",
+        "iconNone": "None",
+        "parentMenu": "Parent menu",
+        "parentMenuHelp": "Select a parent menu",
+        "parentMenuPlaceholder": "Select parent menu",
+        "parentMenuNone": "Top level",
+        "order": "Order",
+        "orderHelp": "Set display order",
+        "permissions": "Permissions",
+        "permissionsHelp": "Select required permissions",
+        "permissionsSelect": "Select permissions",
+        "permissionsSelectedCount": "{count} selected",
+        "permissionsSearch": "Search permissions...",
+        "permissionsEmpty": "No permissions found.",
+        "isActiveHelp": "Set whether this menu is active",
+        "isActiveLabel": "Active"
+      }
+    }
+  },
+  "AdminPermissions": {
+    "header": {
+      "title": "Permission management",
+      "addPermission": "Add permission"
+    },
+    "stats": {
+      "total": "Total permissions",
+      "active": "Active permissions",
+      "inactive": "Inactive permissions",
+      "system": "System permissions"
+    },
+    "filters": {
+      "searchPlaceholder": "Search by Permission name, Display name, or Description...",
+      "category": "Category",
+      "status": "Status",
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "toast": {
+      "createSuccess": "Permission created successfully.",
+      "updateSuccess": "Permission updated successfully.",
+      "deleteSuccess": "Permission deleted successfully.",
+      "toggleSuccess": "Permission status was updated.",
+      "requiredFields": "Please fill in all required fields."
+    },
+    "loading": "Loading permissions...",
+    "errorLoading": "Failed to load permissions.",
+    "list": {
+      "cardTitle": "Permission list",
+      "columnSettings": "Column settings",
+      "columnSettingsShort": "Columns",
+      "columns": {
+        "name": "Permission name",
+        "displayName": "Display name",
+        "description": "Description",
+        "isSystem": "System permission",
+        "isActive": "Status",
+        "actions": "Actions"
+      },
+      "systemBadge": "System",
+      "empty": "No data.",
+      "collapseAll": "Collapse all",
+      "expandAll": "Expand all",
+      "deleteDialogTitle": "Delete permission",
+      "deleteConfirm": "Delete permission {name}?",
+      "deleteIrreversible": "This action cannot be undone.",
+      "deleteConfirmButton": "Delete",
+      "cancel": "Cancel"
+    },
+    "dialog": {
+      "titleCreate": "Add permission",
+      "titleEdit": "Edit permission",
+      "description": "Enter permission details. Required: permission name and display name.",
+      "cancel": "Cancel",
+      "submitCreate": "Add",
+      "submitEdit": "Save",
+      "fields": {
+        "name": "Permission name",
+        "nameHelp": "Letters, numbers, and dot (.) only",
+        "namePlaceholder": "e.g. dashboard.read",
+        "displayName": "Display name",
+        "displayNamePlaceholder": "e.g. Read dashboard",
+        "category": "Category",
+        "categoryPlaceholder": "Select a category",
+        "categoryNone": "None",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe the permission",
+        "isActiveLabel": "Active"
+      },
+      "usage": {
+        "title": "Usage",
+        "loading": "Loading...",
+        "rolesTitle": "Linked roles ({count})",
+        "usersTitle": "Directly assigned users ({count})",
+        "menusTitle": "Linked menus ({count})"
+      }
+    }
+  },
+  "AdminCodes": {
+    "header": {
+      "title": "Code management"
+    },
+    "loading": {
+      "page": "Loading codes...",
+      "codes": "Loading..."
+    },
+    "error": {
+      "load": "Failed to load codes."
+    },
+    "stats": {
+      "group": {
+        "total": "Total groups",
+        "active": "Active groups",
+        "inactive": "Inactive groups",
+        "system": "System groups"
+      },
+      "code": {
+        "total": "Total codes",
+        "active": "Active codes",
+        "inactive": "Inactive codes",
+        "system": "System codes"
+      }
+    },
+    "tabs": {
+      "group": "Code groups",
+      "code": "Codes"
+    },
+    "actions": {
+      "addGroup": "Add group",
+      "addCode": "Add code",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "add": "Add",
+      "edit": "Save"
+    },
+    "filters": {
+      "groupSearchPlaceholder": "Search by Group or Group name...",
+      "codeSearchPlaceholder": "Search by Code or Code name...",
+      "statusLabel": "Status",
+      "status": {
+        "all": "All",
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "empty": {
+      "groups": "No code groups found.",
+      "codes": "No codes found.",
+      "selectGroup": "Select a code group on the left"
+    },
+    "toast": {
+      "requiredFields": "Please fill in all required fields.",
+      "groupCreateSuccess": "Code group created.",
+      "groupUpdateSuccess": "Code group updated.",
+      "groupDeleteSuccess": "Code group deleted.",
+      "groupToggleSuccess": "Code group status updated.",
+      "groupSystemDeleteError": "System code groups cannot be deleted.",
+      "codeCreateSuccess": "Code created.",
+      "codeUpdateSuccess": "Code updated.",
+      "codeDeleteSuccess": "Code deleted.",
+      "codeToggleSuccess": "Code status updated.",
+      "codeSystemDeleteError": "System codes cannot be deleted."
+    },
+    "dialogs": {
+      "group": {
+        "titleCreate": "Add code group",
+        "titleEdit": "Edit code group",
+        "description": "Enter code group details. Required: group code and group name.",
+        "fields": {
+          "groupCode": "Group code",
+          "groupCodePlaceholder": "e.g. USER_TYPE",
+          "groupName": "Group name",
+          "groupNamePlaceholder": "e.g. User type",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe the code group",
+          "parentGroup": "Parent group",
+          "parentGroupPlaceholder": "None",
+          "parentGroupNone": "None",
+          "isActiveLabel": "Active"
+        }
+      },
+      "code": {
+        "titleCreate": "Add code",
+        "titleEdit": "Edit code",
+        "description": "Enter code details. Required: code and code name.",
+        "systemEditWarning": "System codes cannot be edited.",
+        "fields": {
+          "code": "Code",
+          "codePlaceholder": "e.g. ADMIN",
+          "codeName": "Code name",
+          "codeNamePlaceholder": "e.g. Administrator",
+          "sortOrder": "Sort order",
+          "description": "Description",
+          "descriptionPlaceholder": "Describe the code",
+          "isActiveLabel": "Active"
+        }
+      },
+      "confirm": {
+        "groupDeleteTitle": "Delete code group",
+        "groupDeleteQuestion": "Delete code group \"{name}\"?",
+        "codeDeleteTitle": "Delete code",
+        "codeDeleteQuestion": "Delete code \"{name}\"?",
+        "irreversible": "This action cannot be undone."
+      }
+    }
+  },
+  "Equipment": {
+    "create": {
+      "title": "Register equipment",
+      "description": "Register new equipment. The operation is processed asynchronously.",
+      "fields": {
+        "name": "Name",
+        "namePlaceholder": "Enter equipment name",
+        "location": "Location",
+        "locationPlaceholder": "Enter equipment location",
+        "isActiveLabel": "Active"
+      },
+      "actions": {
+        "submit": "Register"
+      },
+      "job": {
+        "creating": "Creating job...",
+        "processing": "Processing...",
+        "statusTitle": "Job status"
+      },
+      "messages": {
+        "required": "Please enter equipment name and location.",
+        "jobCreated": "Job created. Processing...",
+        "unknownError": "Unknown error",
+        "jobCreateFailed": "Failed to create job: {message}",
+        "completed": "Equipment registered. Equipment ID: {id}",
+        "jobFailed": "Job failed: {error}"
+      }
+    },
+    "detail": {
+      "title": "Equipment details",
+      "loading": "Loading equipment details...",
+      "notFound": "Equipment not found.",
+      "fields": {
+        "id": "Equipment ID",
+        "name": "Name",
+        "location": "Location",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive"
+      }
+    },
+    "edit": {
+      "title": "Edit equipment",
+      "loading": "Loading equipment details...",
+      "fields": {
+        "namePlaceholder": "Equipment name",
+        "locationPlaceholder": "Equipment location",
+        "isActiveLabel": "Active"
+      },
+      "actions": {
+        "save": "Save"
+      },
+      "messages": {
+        "updated": "Equipment \"{name}\" updated successfully."
+      }
+    }
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "The page you requested does not exist or may have been moved. Check the URL or use the buttons below.",
+    "home": "Go home",
+    "back": "Go back",
+    "help": "If the problem persists, contact your administrator."
+  }
+}

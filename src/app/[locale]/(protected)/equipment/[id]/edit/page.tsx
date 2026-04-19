@@ -6,8 +6,13 @@ import { useEquipmentQuery, useEquipmentUpdate } from "@/hooks/equipment/useEqui
 import { ApiError } from "@/lib/api/ApiError";
 import Loading from "@/components/common/Loading";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { useTranslations } from "next-intl";
 
 export default function EquipmentEditForm() {
+  const t = useTranslations("Equipment.edit");
+  const tFields = useTranslations("Equipment.edit.fields");
+  const tActions = useTranslations("Equipment.edit.actions");
+  const tMsg = useTranslations("Equipment.edit.messages");
   const params = useParams()
   const id = params?.id as string
 
@@ -27,7 +32,7 @@ export default function EquipmentEditForm() {
     }
   }, [equipment]);
 
-  if (isLoading) return <Loading message="설비 정보를 불러오는 중입니다..." />;
+  if (isLoading) return <Loading message={t("loading")} />;
   if (fetchError) return <ErrorMessage message={fetchError.message} />;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -37,7 +42,7 @@ export default function EquipmentEditForm() {
       { name, location, isActive },
       {
         onSuccess: (data) => {
-          setMessage(`✅ ${data.name} 설비가 성공적으로 수정되었습니다.`);
+          setMessage(`✅ ${tMsg("updated", { name: data.name })}`);
         },
         // onError: (err) => {
         //   setMessage(`❌ 수정 실패: ${err.message}`);
@@ -48,16 +53,16 @@ export default function EquipmentEditForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>설비 수정</h2>
+      <h2>{t("title")}</h2>
       <input
         type="text"
-        placeholder="설비 이름"
+        placeholder={tFields("namePlaceholder")}
         value={name}
         onChange={(e) => setName(e.target.value)}
       />
       <input
         type="text"
-        placeholder="설비 위치"
+        placeholder={tFields("locationPlaceholder")}
         value={location}
         onChange={(e) => setLocation(e.target.value)}
       />
@@ -67,10 +72,10 @@ export default function EquipmentEditForm() {
           checked={isActive}
           onChange={(e) => setIsActive(e.target.checked)}
         />
-        가동 중
+        {tFields("isActiveLabel")}
       </label>
       <button type="submit" disabled={isPending}>
-        저장
+        {tActions("save")}
       </button>
       {message && <p>{message}</p>}
       {updateError instanceof ApiError && updateError.status !== 401 && <p style={{ color: "red" }}>{updateError.message}</p>}

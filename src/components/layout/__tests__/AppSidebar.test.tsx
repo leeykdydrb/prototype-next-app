@@ -16,22 +16,23 @@ import type { MenuTree } from '@/types/menu';
 const mockPush = vi.fn();
 const mockUsePathname = vi.fn(() => '/dashboard');
 
-vi.mock('next/navigation', async () => {
-  const actual = await vi.importActual('next/navigation');
-  return {
-    ...actual,
-    useRouter: () => ({
-      push: mockPush,
-    }),
-    usePathname: () => mockUsePathname(),
-  };
-});
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: () => ({
+    push: mockPush,
+  }),
+  usePathname: () => mockUsePathname(),
+}));
+
+vi.mock("@/hooks/menu/useNavMenuTitle", () => ({
+  useNavMenuTitle: () => (menu: { title: string }) => menu.title,
+}));
 
 describe('AppSidebar', () => {
   const mockMenus: MenuTree[] = [
     {
       id: 1,
       title: 'Dashboard',
+      titleKey: 'NavMenu.dashboard',
       path: '/dashboard',
       icon: 'Dashboard',
       order: 1,
@@ -44,6 +45,7 @@ describe('AppSidebar', () => {
     {
       id: 2,
       title: 'Settings',
+      titleKey: 'NavMenu.settings',
       path: '/settings',
       icon: 'Settings',
       order: 2,
@@ -55,6 +57,7 @@ describe('AppSidebar', () => {
         {
           id: 3,
           title: 'User Settings',
+          titleKey: 'NavMenu.settings',
           path: '/settings/user',
           icon: null,
           order: 1,

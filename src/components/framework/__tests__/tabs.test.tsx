@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import React, { useState } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../layout/tabs';
@@ -16,10 +17,10 @@ describe('Tabs', () => {
   });
 
   /**
-   * Tabs의 className, defaultValue, controlled value가 올바르게 작동하는지 테스트
+   * Tabs의 className과 defaultValue가 올바르게 작동하는지 테스트
    */
-  it('should apply className and handle defaultValue/controlled value', () => {
-    const { container, rerender } = render(
+  it('should apply className and defaultValue', () => {
+    const { container } = render(
       <Tabs defaultValue="tab1" className="custom-tabs-class">
         <TabsList>
           <TabsTrigger value="tab1">Tab 1</TabsTrigger>
@@ -33,20 +34,44 @@ describe('Tabs', () => {
     expect(tabs?.className).toContain('custom-tabs-class');
     expect(screen.getByText('Tab 1')).toBeDefined();
     expect(screen.getByText('Content 1')).toBeDefined();
+  });
 
-    // Controlled value 테스트
-    rerender(
-      <Tabs value="tab2" className="custom-tabs-class">
-        <TabsList>
-          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-        </TabsList>
-        <TabsContent value="tab1">Content 1</TabsContent>
-        <TabsContent value="tab2">Content 2</TabsContent>
-      </Tabs>
-    );
-    const tab2 = screen.getByText('Tab 2');
-    expect(tab2.getAttribute('data-state')).toBe('active');
+  /**
+   * Tabs가 제어 모드(value)에서 올바르게 작동하는지 테스트
+   * - 같은 Tabs 인스턴스에서 defaultValue ↔ value 전환(rerender)은 React 경고를 유발할 수 있어 분리합니다.
+   */
+  it('should work in controlled mode with value', async () => {
+    const user = userEvent.setup();
+
+    function ControlledTabsHarness({ initialValue }: { initialValue: string }) {
+      const [value, setValue] = useState(initialValue);
+
+      return (
+        <Tabs value={value} onValueChange={setValue} className="custom-tabs-class">
+          <TabsList>
+            <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+            <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">Content 1</TabsContent>
+          <TabsContent value="tab2">Content 2</TabsContent>
+        </Tabs>
+      );
+    }
+
+    const { container } = render(<ControlledTabsHarness initialValue="tab1" />);
+
+    const tabs = container.querySelector('[role="tablist"]')?.parentElement;
+    expect(tabs?.className).toContain('custom-tabs-class');
+
+    expect(screen.getByText('Tab 1').getAttribute('data-state')).toBe('active');
+    expect(screen.getByText('Content 1')).toBeDefined();
+
+    await user.click(screen.getByText('Tab 2'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Tab 2').getAttribute('data-state')).toBe('active');
+      expect(screen.getByText('Content 2')).toBeDefined();
+    });
   });
 
 
@@ -295,21 +320,30 @@ describe('Tabs Complex Scenarios', () => {
    */
   it('should work as controlled component', async () => {
     const user = userEvent.setup();
-    let currentValue = 'tab1';
-    const handleValueChange = vi.fn((value: string) => {
-      currentValue = value;
-    });
+    const handleValueChange = vi.fn();
 
-    const { rerender } = render(
-      <Tabs value={currentValue} onValueChange={handleValueChange}>
-        <TabsList>
-          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-        </TabsList>
-        <TabsContent value="tab1">Content 1</TabsContent>
-        <TabsContent value="tab2">Content 2</TabsContent>
-      </Tabs>
-    );
+    function ControlledTabsHarness({ initialValue }: { initialValue: string }) {
+      const [value, setValue] = useState(initialValue);
+
+      return (
+        <Tabs
+          value={value}
+          onValueChange={(next) => {
+            handleValueChange(next);
+            setValue(next);
+          }}
+        >
+          <TabsList>
+            <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+            <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+          </TabsList>
+          <TabsContent value="tab1">Content 1</TabsContent>
+          <TabsContent value="tab2">Content 2</TabsContent>
+        </Tabs>
+      );
+    }
+
+    render(<ControlledTabsHarness initialValue="tab1" />);
 
     // 초기 상태: Tab 1이 활성화되어 있음
     expect(screen.getByText('Content 1')).toBeDefined();
@@ -317,18 +351,6 @@ describe('Tabs Complex Scenarios', () => {
     // Tab 2 클릭
     await user.click(screen.getByText('Tab 2'));
     expect(handleValueChange).toHaveBeenCalledWith('tab2');
-
-    // value 업데이트 후 재렌더링
-    rerender(
-      <Tabs value={currentValue} onValueChange={handleValueChange}>
-        <TabsList>
-          <TabsTrigger value="tab1">Tab 1</TabsTrigger>
-          <TabsTrigger value="tab2">Tab 2</TabsTrigger>
-        </TabsList>
-        <TabsContent value="tab1">Content 1</TabsContent>
-        <TabsContent value="tab2">Content 2</TabsContent>
-      </Tabs>
-    );
 
     // Tab 2 콘텐츠가 표시되는지 확인
     await waitFor(() => {

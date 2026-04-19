@@ -1,24 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { CardComponents } from '@/components/framework';
 import { Badge } from '@/components/framework/data-display';
 import { ChevronRight } from 'lucide-react';
 import { SimpleLineChart, SimpleAreaChart, type ChartConfig } from '@/components/framework/chart';
 
 type SeriesPoint = { name: string; value: number; value2: number };
-
-// Chart configuration
-const chartConfig: ChartConfig = {
-  value: {
-    label: "Series A",
-    color: "var(--chart-1)",
-  },
-  value2: {
-    label: "Series B",
-    color: "var(--chart-2)",
-  },
-};
 
 // 실시간 데이터 생성을 위한 훅
 function useRealtimeData(initialData: SeriesPoint[], maxPoints: number = 20) {
@@ -57,7 +46,17 @@ function useRealtimeData(initialData: SeriesPoint[], maxPoints: number = 20) {
   return data;
 }
 
-function TemperatureCard({ title, data, status = '정상' }: { title: string; data: SeriesPoint[]; status?: string }) {
+function TemperatureCard({
+  title,
+  data,
+  status,
+  chartConfig,
+}: {
+  title: string;
+  data: SeriesPoint[];
+  status: string;
+  chartConfig: ChartConfig;
+}) {
   // Preset을 사용한 간단한 방법 (주석 처리된 부분은 기존 방법)
   return (
     <CardComponents.Root className="py-2 gap-2 min-w-0">
@@ -114,7 +113,15 @@ function TemperatureCard({ title, data, status = '정상' }: { title: string; da
   );
 }
 
-function UsageCard({ title, data }: { title: string; data: SeriesPoint[]; color?: string }) {
+function UsageCard({
+  title,
+  data,
+  chartConfig,
+}: {
+  title: string;
+  data: SeriesPoint[];
+  chartConfig: ChartConfig;
+}) {
   // Preset을 사용한 간단한 방법
   return (
     <CardComponents.Root className="py-1 gap-1 min-w-0 h-36">
@@ -169,6 +176,24 @@ function UsageCard({ title, data }: { title: string; data: SeriesPoint[]; color?
 }
 
 export default function SystemGraphs() {
+  const tGraphs = useTranslations('Dashboard.graphs');
+  const tDash = useTranslations('Dashboard');
+  const statusOk = tDash('status.ok');
+
+  const chartConfig: ChartConfig = useMemo(
+    () => ({
+      value: {
+        label: tGraphs('seriesA'),
+        color: 'var(--chart-1)',
+      },
+      value2: {
+        label: tGraphs('seriesB'),
+        color: 'var(--chart-2)',
+      },
+    }),
+    [tGraphs],
+  );
+
   // 초기 데이터 생성
   const generateInitialData = (count: number = 10) => {
     const now = new Date();
@@ -194,15 +219,25 @@ export default function SystemGraphs() {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 lg:gap-1">
       {/* Left column: Temperature (line) */}
       <div className="lg:col-span-8 space-y-2 min-w-0">
-        <TemperatureCard title="CPU 온도" data={cpuTemp} status="정상" />
-        <TemperatureCard title="GPU 온도" data={gpuTemp} status="정상" />
+        <TemperatureCard
+          title={tGraphs('cpuTemp')}
+          data={cpuTemp}
+          status={statusOk}
+          chartConfig={chartConfig}
+        />
+        <TemperatureCard
+          title={tGraphs('gpuTemp')}
+          data={gpuTemp}
+          status={statusOk}
+          chartConfig={chartConfig}
+        />
       </div>
 
       {/* Right column: Usage (area) */}
       <div className="lg:col-span-4 space-y-2 min-w-0">
-        <UsageCard title="CPU 용량" data={cpuUsage} />
-        <UsageCard title="메모리 용량" data={memoryUsage} />
-        <UsageCard title="디스크 용량" data={diskUsage} />
+        <UsageCard title={tGraphs('cpuUsage')} data={cpuUsage} chartConfig={chartConfig} />
+        <UsageCard title={tGraphs('memoryUsage')} data={memoryUsage} chartConfig={chartConfig} />
+        <UsageCard title={tGraphs('diskUsage')} data={diskUsage} chartConfig={chartConfig} />
       </div>
     </div>
   );

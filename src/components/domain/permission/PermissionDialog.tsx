@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Badge } from "@/components/framework/data-display";
 import { Button, FormField, FormGroup, FormSection, Input, Label, Select, SelectItem, Switch, Textarea } from "@/components/framework/form";
 import { Dialog, DialogContent, DialogBody, DialogFooter, DialogHeader } from "@/components/framework/layout";
 import { Loader2 } from "lucide-react";
 import { usePermissionDetailQuery } from "@/hooks/permission/usePermissionQuery";
 import type { PermissionData, PermissionInput, PermissionDialogProps } from "@/types/permission";
-import { MESSAGES } from '@/constants/permission';
+import { showError } from "@/lib/toast";
 
 // 초기 폼 데이터 생성 함수
 const getInitialFormData = (permission: PermissionData | null): PermissionInput => {
@@ -38,6 +39,11 @@ const isFormValid = (form: PermissionInput): boolean => {
 };
 
 export default function PermissionDialog({ open, onClose, onSubmit, permission, categories }: PermissionDialogProps) {
+  const t = useTranslations("AdminPermissions.dialog");
+  const tf = useTranslations("AdminPermissions.dialog.fields");
+  const tToast = useTranslations("AdminPermissions.toast");
+  const tUsage = useTranslations("AdminPermissions.dialog.usage");
+
   const [formData, setFormData] = useState<PermissionInput>(() => getInitialFormData(null));
   const [editingPermission, setEditingPermission] = useState<PermissionData | null>(null);
   const { data: permissionDetail, isLoading: isDetailLoading } = usePermissionDetailQuery(editingPermission?.id ?? 0, !!editingPermission?.id && open);
@@ -71,29 +77,29 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
 
   const handleSubmit = useCallback(() => {
     if (!isValid) {
-      alert(MESSAGES.PERMISSION_REQUIRED_FIELDS);
+      showError(tToast("requiredFields"));
       return;
     }
     onSubmit(formData);
-  }, [isValid, formData, onSubmit]);
+  }, [isValid, formData, onSubmit, tToast]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent size="xl">
         <DialogHeader
-          title={editingPermission ? "권한 수정" : "권한 추가"}
-          description="권한 정보를 입력하세요. 필수 항목은 권한명과 표시명입니다."
+          title={editingPermission ? t("titleEdit") : t("titleCreate")}
+          description={t("description")}
         />
         <DialogBody>
           <FormSection>
             <FormGroup className="pb-0">
-              <FormField helpText="영문, 숫자, 점(.)만 사용 가능">
-                <Label htmlFor="permissionName" required>권한명</Label>
+              <FormField helpText={tf("nameHelp")}>
+                <Label htmlFor="permissionName" required>{tf("name")}</Label>
                 <Input
                   id="permissionName"
                   value={formData.name}
                   onChange={handleNameChange}
-                  placeholder="예: dashboard.read"
+                  placeholder={tf("namePlaceholder")}
                   className="lowercase"
                   required={formData.name.trim() === ''}
                   autoFocus={!editingPermission}
@@ -102,25 +108,25 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
             </FormGroup>
             <FormGroup columns={2} className="pb-0">
               <FormField>
-                <Label htmlFor="displayName" required>표시명</Label>
+                <Label htmlFor="displayName" required>{tf("displayName")}</Label>
                 <Input
                   id="displayName"
                   value={formData.displayName}
                   onChange={(e) => handleFieldChange('displayName', e.target.value)}
-                  placeholder="예: 대시보드 읽기"
+                  placeholder={tf("displayNamePlaceholder")}
                   required={formData.displayName.trim() === ''}
                 />
               </FormField>
               <FormField>
-                <Label htmlFor="category" required>카테고리</Label>
+                <Label htmlFor="category" required>{tf("category")}</Label>
                 <Select
                   id="category"
                   value={formData.categoryId ? formData.categoryId.toString() : ""}
                   onValueChange={handleSelectChange}
-                  placeholder="카테고리를 선택하세요"
+                  placeholder={tf("categoryPlaceholder")}
                   error={formData.categoryId === 0}
                 >
-                  <SelectItem value="none">없음</SelectItem>
+                  <SelectItem value="none">{tf("categoryNone")}</SelectItem>
                   {categories.map((category) => (
                     <SelectItem key={category.id} value={category.id.toString()}>
                       {category.codeName}
@@ -131,12 +137,12 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
             </FormGroup>
             <FormGroup>
               <FormField>
-                <Label htmlFor="description">설명</Label>
+                <Label htmlFor="description">{tf("description")}</Label>
                 <Textarea
                   id="description"
                   value={formData.description || ""}
                   onChange={(e) => handleFieldChange('description', e.target.value)}
-                  placeholder="권한에 대한 설명을 입력하세요"
+                  placeholder={tf("descriptionPlaceholder")}
                 />
               </FormField>
               <FormField>
@@ -144,7 +150,7 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
                   checked={formData.isActive}
                   onCheckedChange={(checked) => handleFieldChange('isActive', checked)}
                   disabled={formData.isSystem}
-                  label="활성화"
+                  label={tf("isActiveLabel")}
                   id="isActive"
                 />
               </FormField>
@@ -152,17 +158,17 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
           </FormSection>
           {editingPermission && (
             <div className="space-y-4 border-t pt-4">
-              <h4 className="text-sm font-medium">사용 현황</h4>
+              <h4 className="text-sm font-medium">{tUsage("title")}</h4>
               {isDetailLoading ? (
                 <div className="flex items-center justify-center py-4">
                   <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  <span className="text-sm text-muted-foreground">로딩 중...</span>
+                  <span className="text-sm text-muted-foreground">{tUsage("loading")}</span>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">
-                      연결된 역할 ({permissionDetail?.rolePermissions.length || 0}개)
+                      {tUsage("rolesTitle", { count: permissionDetail?.rolePermissions.length || 0 })}
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {permissionDetail?.rolePermissions.map((rp) => (
@@ -175,7 +181,7 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
                   
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">
-                      직접 할당된 사용자 ({permissionDetail?.userPermissions.length || 0}명)
+                      {tUsage("usersTitle", { count: permissionDetail?.userPermissions.length || 0 })}
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {permissionDetail?.userPermissions.map((up) => (
@@ -188,7 +194,7 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
                   
                   <div>
                     <p className="text-sm text-muted-foreground mb-2">
-                      연결된 메뉴 ({permissionDetail?.menuPermissions.length || 0}개)
+                      {tUsage("menusTitle", { count: permissionDetail?.menuPermissions.length || 0 })}
                     </p>
                     <div className="flex flex-wrap gap-1">
                       {permissionDetail?.menuPermissions.map((mp) => (
@@ -206,10 +212,10 @@ export default function PermissionDialog({ open, onClose, onSubmit, permission, 
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            취소
+            {t("cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!isValid}>
-            {editingPermission ? '수정' : '추가'}
+            {editingPermission ? t("submitEdit") : t("submitCreate")}
           </Button>
         </DialogFooter>
       </DialogContent>

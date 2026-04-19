@@ -10,6 +10,7 @@ export const buildMenuTree = (flatMenus: MenuData[]): MenuTree[] => {
     menuMap[menu.id] = {
       id: menu.id,
       title: menu.title,
+      titleKey: menu.titleKey,
       path: menu.path,
       icon: menu.icon,
       order: menu.order,

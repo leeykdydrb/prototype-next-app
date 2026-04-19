@@ -13,30 +13,27 @@ import {
 import type { ColumnDef } from "@tanstack/react-table";
 import type { MenuData, MenuTree } from "@/types/menu";
 
-export const columnHeaders: Record<string, string> = {
-  path: '경로',
-  icon: '아이콘',
-  order: '순서',
-  isSystem: '시스템 메뉴',
-  isActive: '상태',
-  actions: '작업',
-};
+export type MenuColumnId = "menuName" | "path" | "icon" | "order" | "isSystem" | "isActive" | "actions";
 
 export interface CreateMenuColumnsDeps {
-  onEdit: (role: MenuData) => void;
-  onToggle: (role: MenuData) => void;
-  onDeleteClick: (role: MenuData) => void;
+  onEdit: (menu: MenuData) => void;
+  onToggle: (menu: MenuData) => void;
+  onDeleteClick: (menu: MenuData) => void;
+  labels: Record<MenuColumnId, string>;
+  systemBadge: string;
 }
 
 export function createMenuColumns({
   onEdit,
   onToggle,
   onDeleteClick,
+  labels,
+  systemBadge,
 }: CreateMenuColumnsDeps): ColumnDef<MenuTree>[] {
   return [
     {
       id: "expander",
-      header: "메뉴명",
+      header: labels.menuName,
       cell: ({ row }) => {
         const hasChildren = Boolean(row.original.children?.length);
         const isExpanded = row.getIsExpanded();
@@ -78,7 +75,7 @@ export function createMenuColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            경로
+            {labels.path}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -98,7 +95,7 @@ export function createMenuColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            아이콘
+            {labels.icon}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -116,7 +113,7 @@ export function createMenuColumns({
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             className="h-8 px-2 lg:px-3"
           >
-            순서
+            {labels.order}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         );
@@ -127,12 +124,12 @@ export function createMenuColumns({
     },
     {
       accessorKey: "isSystem",
-      header: "시스템 메뉴",
+      header: labels.isSystem,
       cell: ({ getValue }) => (
         <div className="text-center">
           {getValue() as boolean && (
             <Badge variant="secondary" className="text-xs">
-              시스템
+              {systemBadge}
             </Badge>
           )}
         </div>
@@ -140,7 +137,7 @@ export function createMenuColumns({
     },
     {
       accessorKey: "isActive",
-      header: "상태",
+      header: labels.isActive,
       cell: ({ row }) => (
         <div className="text-center">
           <Switch
@@ -153,7 +150,7 @@ export function createMenuColumns({
     },
     {
       id: "actions",
-      header: "작업",
+      header: labels.actions,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
           <Button

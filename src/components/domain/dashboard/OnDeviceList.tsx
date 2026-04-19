@@ -1,21 +1,14 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader } from '@/components/framework/layout';
 import { Badge } from '@/components/framework/data-display';
 import { ChevronRight } from 'lucide-react';
 
 const deviceData = [
-  {
-    id: 'Jetson01',
-    status: '정상',
-    ip: '192.168.2.2',
-  },
-  {
-    id: 'Jetson02',
-    status: '정상',
-    ip: '192.168.2.3',
-  },
+  { id: 'Jetson01', ip: '192.168.2.2' },
+  { id: 'Jetson02', ip: '192.168.2.3' },
 ];
 
 interface OnDeviceListProps {
@@ -24,17 +17,21 @@ interface OnDeviceListProps {
 }
 
 export default function OnDeviceList({ selectedDevice, onDeviceSelect }: OnDeviceListProps) {
+  const t = useTranslations('Dashboard.onDeviceList');
+  const tDash = useTranslations('Dashboard');
+  const statusOk = tDash('status.ok');
+
   return (
     <Card className="py-2 gap-2 h-full">
-      <CardHeader title="OnDevice List" titleSize="lg" />
+      <CardHeader title={t('title')} titleSize="lg" />
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b">
-                <th className="text-left py-2 px-4 font-medium text-gray-700">Status</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">Device ID</th>
-                <th className="text-left py-2 px-4 font-medium text-gray-700">IP</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colStatus')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colDeviceId')}</th>
+                <th className="text-left py-2 px-4 font-medium text-gray-700">{t('colIp')}</th>
               </tr>
             </thead>
             <tbody>
@@ -48,7 +45,7 @@ export default function OnDeviceList({ selectedDevice, onDeviceSelect }: OnDevic
                 >
                   <td className="py-2 px-4">
                     <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      {device.status}
+                      {statusOk}
                     </Badge>
                   </td>
                   <td className="py-2 px-4">

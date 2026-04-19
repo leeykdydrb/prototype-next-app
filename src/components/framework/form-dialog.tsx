@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Form } from "./form";
 import { DialogPresets } from "./layout/dialog";
 
@@ -46,14 +47,22 @@ const getDefaultValidator = (type: FieldType): ((value: FormDataValue) => boolea
 /**
  * 타입별 기본 에러 메시지
  */
-const getDefaultErrorMessage = (type: FieldType, label: string): string => {
+const getDefaultErrorMessage = (
+  type: FieldType,
+  label: string,
+  i18n: {
+    invalid: (label: string) => string;
+    invalidEmail: string;
+    invalidNumber: string;
+  },
+): string => {
   switch (type) {
     case "email":
-      return "올바른 이메일 형식이 아닙니다.";
+      return i18n.invalidEmail;
     case "number":
-      return "올바른 숫자 형식이 아닙니다.";
+      return i18n.invalidNumber;
     default:
-      return `${label}이(가) 유효하지 않습니다.`;
+      return i18n.invalid(label);
   }
 };
 
@@ -123,14 +132,21 @@ export function FormDialog({
   description,
   fields,
   initialData = {},
-  submitLabel = "저장",
-  cancelLabel = "취소",
+  submitLabel,
+  cancelLabel,
   columns = 2,
   size = "3xl",
   customContent,
   getFormData,
   onFormDataChange,
 }: FormDialogConfig) {
+  const t = useTranslations("Common.formDialog");
+  const submitText = submitLabel ?? t("submitDefault");
+  const cancelText = cancelLabel ?? t("cancelDefault");
+  const requiredMessage = useCallback((label: string) => t("required", { label }), [t]);
+  const invalidMessage = useCallback((label: string) => t("invalid", { label }), [t]);
+  const defaultSelectPlaceholder = t("selectPlaceholder");
+
   const [formData, setFormData] = useState<Record<string, FormDataValue>>(() => initialData || {});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -162,7 +178,7 @@ export function FormDialog({
       
       // 필수 필드 검사
       if (field.required && isEmpty) {
-        newErrors[name] = field.validation?.message || `${field.label}은(는) 필수입니다.`;
+        newErrors[name] = field.validation?.message || requiredMessage(field.label);
         return newErrors;
       }
       
@@ -172,7 +188,13 @@ export function FormDialog({
       if (validator && !isEmpty) {
         if (!validator(value)) {
           // 커스텀 메시지 우선, 없으면 타입별 기본 메시지
-          newErrors[name] = field.validation?.message || getDefaultErrorMessage(field.type, field.label);
+          newErrors[name] =
+            field.validation?.message ||
+            getDefaultErrorMessage(field.type, field.label, {
+              invalid: invalidMessage,
+              invalidEmail: t("invalidEmail"),
+              invalidNumber: t("invalidNumber"),
+            });
         } else {
           // 검증 통과 시 에러 제거
           delete newErrors[name];
@@ -187,7 +209,7 @@ export function FormDialog({
       
       return newErrors;
     });
-  }, [onFormDataChange, fields]);
+  }, [onFormDataChange, fields, invalidMessage, requiredMessage, t]);
 
   // 유효성 검사
   const validate = useCallback(() => {
@@ -202,7 +224,7 @@ export function FormDialog({
       // 필수 필드 검사
       if (field.required) {
         if (!value || (typeof value === 'string' && !value.trim()) || (typeof value === 'number' && value === 0)) {
-          newErrors[field.name] = field.validation?.message || `${field.label}은(는) 필수입니다.`;
+          newErrors[field.name] = field.validation?.message || requiredMessage(field.label);
           return;
         }
       }
@@ -213,14 +235,20 @@ export function FormDialog({
       if (validator && value) {
         if (!validator(value)) {
           // 커스텀 메시지 우선, 없으면 타입별 기본 메시지
-          newErrors[field.name] = field.validation?.message || getDefaultErrorMessage(field.type, field.label);
+          newErrors[field.name] =
+            field.validation?.message ||
+            getDefaultErrorMessage(field.type, field.label, {
+              invalid: invalidMessage,
+              invalidEmail: t("invalidEmail"),
+              invalidNumber: t("invalidNumber"),
+            });
         }
       }
     });
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [formData, fields]);
+  }, [formData, fields, invalidMessage, requiredMessage, t]);
 
   // 제출 핸들러
   const handleSubmit = useCallback(() => {
@@ -245,7 +273,7 @@ export function FormDialog({
     // requireDescription: 에러가 있으면 표시 (필수 필드 에러 또는 커스텀 검증 에러)
     const requireDescription = error 
       ? error
-      : (field.required && isEmpty ? `${field.label}은(는) 필수입니다.` : undefined);
+      : (field.required && isEmpty ? requiredMessage(field.label) : undefined);
 
     switch (field.type) {
       case "text":
@@ -279,7 +307,7 @@ export function FormDialog({
       case "textarea":
         const textareaIsEmpty = !value || (typeof value === 'string' && value.trim() === '');
         const textareaRequireDescription = field.required && textareaIsEmpty 
-          ? (error || `${field.label}은(는) 필수입니다.`)
+          ? (error || requiredMessage(field.label))
           : undefined;
         return (
           <Form.Field 
@@ -304,7 +332,7 @@ export function FormDialog({
       case "select":
         const selectIsEmpty = !value || value === 0 || value === '';
         const selectRequireDescription = field.required && selectIsEmpty 
-          ? (error || `${field.label}은(는) 필수입니다.`)
+          ? (error || requiredMessage(field.label))
           : undefined;
         return (
           <Form.Field 
@@ -320,7 +348,7 @@ export function FormDialog({
               id={field.name}
               value={value ? value.toString() : ""}
               onValueChange={(val) => handleFieldChange(field.name, val)}
-              placeholder={field.placeholder || `선택하세요`}
+              placeholder={field.placeholder || defaultSelectPlaceholder}
               error={!!error}
             >
               {field.options?.map((option) => (
@@ -369,7 +397,7 @@ export function FormDialog({
       default:
         return null;
     }
-  }, [formData, errors, handleFieldChange]);
+  }, [formData, errors, handleFieldChange, requiredMessage, defaultSelectPlaceholder]);
 
   // 초기 데이터 동기화 (다이얼로그가 열릴 때만)
   React.useEffect(() => {
@@ -394,8 +422,8 @@ export function FormDialog({
       title={title}
       description={description}
       onSubmit={handleSubmit}
-      submitLabel={submitLabel}
-      cancelLabel={cancelLabel}
+      submitLabel={submitText}
+      cancelLabel={cancelText}
       submitDisabled={!isValid}
       size={size}
     >

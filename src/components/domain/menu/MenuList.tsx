@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/framework/form";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/framework/data-display";
 import { Card, CardHeader, CardContent } from "@/components/framework/layout";
@@ -22,7 +23,7 @@ import { Columns as ColumnsIcon, ChevronDown as ChevronDownIcon, AlertTriangle a
 import type { MenuListProps, MenuData, MenuTree } from "@/types/menu";
 import TablePagination from "@/components/common/TablePagination";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
-import { createMenuColumns, columnHeaders } from "./table/columns";
+import { createMenuColumns, type MenuColumnId } from "./table/columns";
 
 const MenuList = React.memo(function MenuList({
   menus,
@@ -35,6 +36,23 @@ const MenuList = React.memo(function MenuList({
   onRowsPerPageChange,
   totalCount,
 }: MenuListProps) {
+  const tList = useTranslations("AdminMenus.list");
+  const tCols = useTranslations("AdminMenus.list.columns");
+
+  const labels = useMemo(
+    () =>
+      ({
+        menuName: tCols("menuName"),
+        path: tCols("path"),
+        icon: tCols("icon"),
+        order: tCols("order"),
+        isSystem: tCols("isSystem"),
+        isActive: tCols("isActive"),
+        actions: tCols("actions"),
+      }) satisfies Record<MenuColumnId, string>,
+    [tCols],
+  );
+
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     menu: MenuData | null;
@@ -63,8 +81,14 @@ const MenuList = React.memo(function MenuList({
 
   // 컬럼 정의
   const columns = useMemo(() => (
-    createMenuColumns({ onEdit, onToggle, onDeleteClick: handleDeleteClick })
-  ), [onEdit, onToggle, handleDeleteClick]);
+    createMenuColumns({
+      onEdit,
+      onToggle,
+      onDeleteClick: handleDeleteClick,
+      labels,
+      systemBadge: tList("systemBadge"),
+    })
+  ), [onEdit, onToggle, handleDeleteClick, labels, tList]);
 
   // tanstack/react-table 설정
   const table = useReactTable({
@@ -101,14 +125,14 @@ const MenuList = React.memo(function MenuList({
   return (
     <>
       <Card className="py-4">
-        <CardHeader title="메뉴 목록">
+        <CardHeader title={tList("cardTitle")}>
           <div className="flex items-center gap-2">
             <DropdownMenuComponents.Root>
               <DropdownMenuComponents.Trigger asChild>
                 <Button variant="outline" size="sm">
                   <ColumnsIcon />
-                  <span className="hidden lg:inline">컬럼 설정</span>
-                  <span className="lg:hidden">컬럼</span>
+                  <span className="hidden lg:inline">{tList("columnSettings")}</span>
+                  <span className="lg:hidden">{tList("columnSettingsShort")}</span>
                   <ChevronDownIcon />
                 </Button>
               </DropdownMenuComponents.Trigger>
@@ -123,7 +147,7 @@ const MenuList = React.memo(function MenuList({
                         checked={column.getIsVisible()}
                         onCheckedChange={(value) => column.toggleVisibility(!!value)}
                       >
-                        {columnHeaders[column.id] || column.id}
+                        {(labels as Record<string, string>)[column.id] || column.id}
                       </DropdownMenuComponents.CheckboxItem>
                     );
                   })}
@@ -155,19 +179,27 @@ const MenuList = React.memo(function MenuList({
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} className="hover:bg-muted/50">
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell 
-                      key={cell.id} 
-                      className="data-[name=expander]:w-60 data-[name=path]:w-40 data-[name=icon]:w-20 data-[name=order]:w-20 data-[name=isSystem]:w-24 data-[name=isActive]:w-20 data-[name=actions]:w-24 data-[name=expander]:text-left data-[name=path]:text-left data-[name=icon]:text-center data-[name=order]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
-                      data-name={cell.column.id}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
+              {table.getRowModel().rows.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-24 text-center text-muted-foreground">
+                    {tList("empty")}
+                  </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} className="hover:bg-muted/50">
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell 
+                        key={cell.id} 
+                        className="data-[name=expander]:w-60 data-[name=path]:w-40 data-[name=icon]:w-20 data-[name=order]:w-20 data-[name=isSystem]:w-24 data-[name=isActive]:w-20 data-[name=actions]:w-24 data-[name=expander]:text-left data-[name=path]:text-left data-[name=icon]:text-center data-[name=order]:text-center data-[name=isSystem]:text-center data-[name=isActive]:text-center data-[name=actions]:text-center"
+                        data-name={cell.column.id}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
 
@@ -180,21 +212,15 @@ const MenuList = React.memo(function MenuList({
         open={deleteDialog.open}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="메뉴 삭제"
+        title={tList("deleteDialogTitle")}
         content={
           <div className="space-y-2">
-            <p>
-              <span className="font-semibold">
-                {deleteDialog.menu?.title}
-              </span>
-              {" 메뉴를 삭제하시겠습니까?"}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              이 작업은 되돌릴 수 없습니다.
-            </p>
+            <p>{tList("deleteConfirm", { name: deleteDialog.menu?.title ?? "" })}</p>
+            <p className="text-sm text-muted-foreground">{tList("deleteIrreversible")}</p>
           </div>
         }
-        confirmText="삭제"
+        confirmText={tList("deleteConfirmButton")}
+        cancelText={tList("cancel")}
         confirmButtonColor="destructive"
         icon={<WarningIcon className="h-5 w-5 text-warning" />}
       />

@@ -8,10 +8,12 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { SidebarInset, SidebarProvider } from "@/components/framework/layout";
 
 import { useMenuQuery } from "@/hooks/menu/useMenuQuery";
-import { buildMenuTree } from "@/utils/buildMenuTree";
 import { useMenuStore } from "@/store/menuStore";
+import { buildMenuTree } from "@/utils/buildMenuTree";
+import { useTranslations } from "next-intl";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("Common");
   const { setMenus } = useMenuStore();
 
   const { data, isLoading, error } = useMenuQuery({ isActive: true });
@@ -20,7 +22,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (data) setMenus(data);
   }, [data, setMenus]);
 
-  if (isLoading) return <Loading message="로딩중..." />;
+  if (isLoading) return <Loading message={t("loading")} />;
   if (error) return <ErrorMessage message={error.message} />;
 
   const menus = buildMenuTree(data ?? []);
@@ -34,7 +36,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         <SidebarInset className="flex flex-col h-screen overflow-hidden">
           {/* 헤더 */}
-          <AppHeader title="PROTOTYPE SOLUTION SYSTEM" menus={menus} />
+          <AppHeader title="MICUBE SOLUTION SYSTEM" menus={menus} />
           {/* 메인 콘텐츠 */}
           <main className="flex-1 p-2 overflow-auto">
             {children}

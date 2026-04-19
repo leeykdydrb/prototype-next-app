@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { CodeGroupListProps, CodeGroupData, CodeGroupTree } from "@/types/code-group";
 import ConfirmDialog from "@/components/common/ConfirmDialog";
+import { useTranslations } from "next-intl";
 
 const CodeGroupList = React.memo(function CodeGroupList({
   codeGroups,
@@ -25,6 +26,8 @@ const CodeGroupList = React.memo(function CodeGroupList({
   onDelete,
   onToggle,
 }: CodeGroupListProps) {
+  const tConfirm = useTranslations("AdminCodes.dialogs.confirm");
+  const tActions = useTranslations("AdminCodes.actions");
   const [deleteDialog, setDeleteDialog] = useState<{
     open: boolean;
     codeGroup: CodeGroupData | null;
@@ -167,21 +170,16 @@ const CodeGroupList = React.memo(function CodeGroupList({
         open={deleteDialog.open}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="코드 그룹 삭제"
+        title={tConfirm("groupDeleteTitle")}
         content={
           <div className="space-y-2 text-left">
-            <p>
-              <span className="font-semibold">
-                {deleteDialog.codeGroup?.groupName}
-              </span>
-              {" 코드 그룹을 삭제하시겠습니까?"}
-            </p>
+            <p>{tConfirm("groupDeleteQuestion", { name: deleteDialog.codeGroup?.groupName ?? "" })}</p>
             <p className="text-sm text-muted-foreground">
-              이 작업은 되돌릴 수 없습니다.
+              {tConfirm("irreversible")}
             </p>
           </div>
         }
-        confirmText="삭제"
+        confirmText={tActions("delete")}
         confirmButtonColor="destructive"
         icon={<WarningIcon className="h-5 w-5 text-warning" />}
       />

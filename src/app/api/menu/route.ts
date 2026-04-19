@@ -125,11 +125,12 @@ export const GET = withAuthGuard(async (req) => {
 });
 
 export const POST = withPermissionGuard('menu.create', async (req) => {
-  const { title, path, icon, parentId, order, isActive, permissionIds } = await req.json();
+  const { title, titleKey, path, icon, parentId, order, isActive, permissionIds } = await req.json();
 
   const createMenu = await prisma.menu.create({
     data: {
       title,
+      titleKey,
       path,
       icon,
       parentId,

@@ -6,31 +6,28 @@ import { Edit as EditIcon, Trash2 as DeleteIcon } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { PermissionData } from "@/types/permission";
 
-export const columnHeaders: Record<string, string> = {
-  name: '권한명',
-  displayName: '표시명',
-  description: '설명',
-  isSystem: '시스템 권한',
-  isActive: '상태',
-  actions: '작업'
-};
+export type PermissionColumnId = "name" | "displayName" | "description" | "isSystem" | "isActive" | "actions";
 
 export interface CreatePermissionColumnsDeps {
   onEdit: (permission: PermissionData) => void;
   onToggle: (permission: PermissionData) => void;
   onDeleteClick: (permission: PermissionData) => void;
+  labels: Record<PermissionColumnId, string>;
+  systemBadge: string;
 }
 
 export function createPermissionColumns({
   onEdit,
   onToggle,
   onDeleteClick,
+  labels,
+  systemBadge,
 }: CreatePermissionColumnsDeps): ColumnDef<PermissionData>[] {
   return [
     {
       id: "name",
       accessorKey: "name",
-      header: columnHeaders.name,
+      header: labels.name,
       cell: ({ row }) => (
         <span className="text-sm font-mono">{row.getValue("name")}</span>
       ),
@@ -38,13 +35,13 @@ export function createPermissionColumns({
     {
       id: "displayName",
       accessorKey: "displayName",
-      header: columnHeaders.displayName,
+      header: labels.displayName,
       cell: ({ row }) => row.getValue("displayName"),
     },
     {
       id: "description",
       accessorKey: "description",
-      header: columnHeaders.description,
+      header: labels.description,
       cell: ({ row }) => (
         <span className="text-sm text-muted-foreground truncate max-w-[200px] block">
           {row.getValue("description")}
@@ -54,12 +51,12 @@ export function createPermissionColumns({
     {
       id: "isSystem",
       accessorKey: "isSystem",
-      header: columnHeaders.isSystem,
+      header: labels.isSystem,
       cell: ({ row }) => (
         <div className="text-center">
           {row.getValue("isSystem") ? (
             <Badge variant="secondary" className="text-xs">
-              시스템
+              {systemBadge}
             </Badge>
           ) : null}
         </div>
@@ -68,7 +65,7 @@ export function createPermissionColumns({
     {
       id: "isActive",
       accessorKey: "isActive",
-      header: columnHeaders.isActive,
+      header: labels.isActive,
       cell: ({ row }) => (
         <div className="text-center">
           <Switch
@@ -81,7 +78,7 @@ export function createPermissionColumns({
     },
     {
       id: "actions",
-      header: columnHeaders.actions,
+      header: labels.actions,
       cell: ({ row }) => (
         <div className="flex items-center justify-center gap-1">
           <Button

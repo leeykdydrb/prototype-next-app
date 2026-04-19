@@ -117,6 +117,7 @@ model UserPermission {
 model Menu {
   id          Int     @id @default(autoincrement())
   title       String
+  titleKey    String
   path        String?
   icon        String?  // 아이콘 이름
   order       Int     @default(0)

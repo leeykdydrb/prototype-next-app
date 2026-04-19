@@ -8,10 +8,12 @@
 import { useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useSessionUser } from "@/lib/auth/useSessionUser";
 import Loading from "@/components/common/Loading";
 
 export default function SessionGuard({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("Common");
   const { data: session, status } = useSession();
   const pathname = usePathname();
   const isRedirecting = useRef(false);
@@ -31,7 +33,7 @@ export default function SessionGuard({ children }: { children: React.ReactNode }
     }
   }, [status, isAuthPage]);
 
-  if (status === "loading") return <Loading message="로딩중..." />;
+  if (status === "loading") return <Loading message={t("loading")} />;
 
   return <>{children}</>;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/framework/layout';
 import { Button, FormField, FormGroup, Label, Select, SelectItem } from '@/components/framework/form';
 import { Check, X } from 'lucide-react';
@@ -17,6 +18,8 @@ interface CameraControlProps {
 }
 
 export default function CameraControl({ settings, onApply, onCancel }: CameraControlProps) {
+  const t = useTranslations('DeviceControl.camera');
+  const tActions = useTranslations('DeviceControl.actions');
   const [cameraSettings, setCameraSettings] = useState<CameraSettings>(settings);
 
   // 외부에서 설정값이 변경되면 내부 상태도 업데이트
@@ -39,31 +42,28 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
   };
 
   const handleCancel = () => {
-    setCameraSettings({
-      left: { exposure: 0.5, gain: 6 },
-      right: { exposure: 0.5, gain: 6 }
-    });
+    setCameraSettings(settings);
     onCancel();
   };
 
   return (
     <Card className="py-2 gap-2 h-full flex flex-col">
-      <CardHeader title="카메라 제어" titleSize="lg" />
+      <CardHeader title={t('title')} titleSize="lg" />
       <CardContent className="flex-1 flex flex-col">
         <Tabs defaultValue="left" className="w-full flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="left" className="data-[state=active]:bg-gray-400 data-[state=active]:text-white">
-              Cam_Left
+              {t('tabLeft')}
             </TabsTrigger>
             <TabsTrigger value="right" className="data-[state=active]:bg-gray-400 data-[state=active]:text-white">
-              Cam_Right
+              {t('tabRight')}
             </TabsTrigger>
           </TabsList>
           
           <TabsContent value="left" className="flex-1 flex flex-col space-y-4">
             <FormGroup columns={2}>
               <FormField>
-                <Label htmlFor="exposure-left">노출(ms)</Label>
+                <Label htmlFor="exposure-left">{t('exposure')}</Label>
                 <Select 
                   value={cameraSettings.left.exposure.toFixed(1)} 
                   onValueChange={(value) => handleSettingChange('left', 'exposure', value)}
@@ -75,7 +75,7 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
                 </Select>
               </FormField>
               <FormField>
-                <Label htmlFor="gain-left">게인(dB)</Label>
+                <Label htmlFor="gain-left">{t('gain')}</Label>
                 <Select 
                   value={cameraSettings.left.gain.toString()} 
                   onValueChange={(value) => handleSettingChange('left', 'gain', value)}
@@ -93,14 +93,14 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
                 className="bg-gray-600 hover:bg-gray-700 cursor-pointer"
               >
                 <Check className="h-4 w-4 mr-2" />
-                Apply
+                {tActions('apply')}
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={handleCancel}
               >
                 <X className="h-4 w-4 mr-2" />
-                Cancel
+                {tActions('cancel')}
               </Button>
             </div>
           </TabsContent>
@@ -108,7 +108,7 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
           <TabsContent value="right" className="flex-1 flex flex-col space-y-4">
             <FormGroup columns={2}>
               <FormField>
-                <Label htmlFor="exposure-right">노출(ms)</Label>
+                <Label htmlFor="exposure-right">{t('exposure')}</Label>
                 <Select 
                   value={cameraSettings.right.exposure.toFixed(1)} 
                   onValueChange={(value) => handleSettingChange('right', 'exposure', value)}
@@ -120,7 +120,7 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
                 </Select>
               </FormField>
               <FormField>
-                <Label htmlFor="gain-right">게인(dB)</Label>
+                <Label htmlFor="gain-right">{t('gain')}</Label>
                 <Select 
                   value={cameraSettings.right.gain.toString()} 
                   onValueChange={(value) => handleSettingChange('right', 'gain', value)}
@@ -138,14 +138,14 @@ export default function CameraControl({ settings, onApply, onCancel }: CameraCon
                 className="bg-gray-600 hover:bg-gray-700 cursor-pointer"
               >
                 <Check className="h-4 w-4 mr-2" />
-                Apply
+                {tActions('apply')}
               </Button>
               <Button 
                 variant="destructive" 
                 onClick={handleCancel}
               >
                 <X className="h-4 w-4 mr-2" />
-                Cancel
+                {tActions('cancel')}
               </Button>
             </div>
           </TabsContent>

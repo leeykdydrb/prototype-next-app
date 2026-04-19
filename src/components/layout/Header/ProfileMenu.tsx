@@ -1,12 +1,15 @@
-'use client'
+"use client";
 
-import React from 'react'
+import React from "react";
+import { Button } from "@/components/framework/form";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/framework/dropdown'
-import { LogOut } from 'lucide-react'
+import { LogOut, User as UserIcon } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useUserStore } from "@/store/userStore";
+import { useTranslations } from "next-intl";
 
-export default function UserMenu({ children }: { children: React.ReactNode }) {
+export default function ProfileMenu() {
+  const t = useTranslations("ProfileMenu");
   const user = useUserStore((state) => state.user);
   const { data: session } = useSession();
 
@@ -45,16 +48,20 @@ export default function UserMenu({ children }: { children: React.ReactNode }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        {children}
+        <Button variant="ghost" size="icon" aria-label={t("aria")}>
+          <UserIcon className="h-4 w-4" />
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className='py-0'>{user?.name || '사용자'}</DropdownMenuItem>
+        <DropdownMenuItem className="py-0">
+          {user?.name || t("anonymous")}
+        </DropdownMenuItem>
         <DropdownMenuItem className='py-0'>{user?.id || ''}</DropdownMenuItem>
         <DropdownMenuItem className='py-0'>{user?.role || ''}</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
-          로그아웃
+          {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

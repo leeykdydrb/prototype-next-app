@@ -19,10 +19,39 @@ import {
   DrawerClose
 } from '../layout/drawer';
 
+// Capture the native implementation BEFORE any tests install spies/mocks.
+const nativeGetComputedStyle = window.getComputedStyle.bind(window);
+
+function installDrawerDomMocks() {
+  // vaul reads computed transforms during pointer interactions; in jsdom/happy-dom
+  // these can be undefined and crash with `.match` on undefined.
+  const mockImpl = (elt: Element) => {
+    const real = nativeGetComputedStyle(elt);
+
+    return new Proxy(real, {
+      get(target, prop) {
+        if (prop === "transform") return "matrix(1, 0, 0, 1, 0, 0)";
+        // Some engines (happy-dom) require the receiver to be a real CSSStyleDeclaration,
+        // not the Proxy itself.
+        return Reflect.get(target, prop, target);
+      },
+    }) as CSSStyleDeclaration;
+  };
+
+  if (vi.isMockFunction(window.getComputedStyle)) {
+    vi.mocked(window.getComputedStyle).mockImplementation(mockImpl as typeof window.getComputedStyle);
+    return;
+  }
+
+  vi.spyOn(window, "getComputedStyle").mockImplementation(mockImpl as typeof window.getComputedStyle);
+}
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  installDrawerDomMocks();
+});
+
 describe('Drawer', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
 
   /**
    * Drawer의 open prop과 onOpenChange가 올바르게 작동하는지 테스트
@@ -57,6 +86,7 @@ describe('Drawer', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
@@ -76,6 +106,7 @@ describe('DrawerContent', () => {
         <DrawerContent className="custom-content-class">
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
@@ -115,6 +146,7 @@ describe('DrawerTitle', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle className="custom-title-class">Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
@@ -134,6 +166,7 @@ describe('DrawerDescription', () => {
       <Drawer open={true}>
         <DrawerContent>
           <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
             <DrawerDescription className="custom-description-class">
               Description
             </DrawerDescription>
@@ -158,6 +191,7 @@ describe('DrawerTrigger', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
@@ -177,6 +211,7 @@ describe('DrawerTrigger', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Drawer Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
         </DrawerContent>
       </Drawer>
@@ -203,6 +238,7 @@ describe('DrawerFooter', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
           </DrawerHeader>
           <DrawerFooter className="custom-footer-class">Footer Text</DrawerFooter>
         </DrawerContent>
@@ -222,6 +258,7 @@ describe('DrawerClose', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
             <DrawerClose>Close</DrawerClose>
           </DrawerHeader>
         </DrawerContent>
@@ -242,6 +279,7 @@ describe('DrawerClose', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
             <DrawerClose>Close</DrawerClose>
           </DrawerHeader>
         </DrawerContent>
@@ -342,6 +380,7 @@ describe('Drawer Complex Scenarios', () => {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Description</DrawerDescription>
             <DrawerClose>Close</DrawerClose>
           </DrawerHeader>
         </DrawerContent>

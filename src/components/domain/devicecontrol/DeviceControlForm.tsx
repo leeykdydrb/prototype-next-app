@@ -104,14 +104,14 @@ export default function DeviceControlForm() {
       {/* Center - Control Settings */}
       <div className="lg:col-span-6 h-full flex flex-col gap-2">
         <div className="flex-1">
-          <CameraControl 
+          <CameraControl
             settings={currentSettings.camera}
             onApply={handleCameraApply}
             onCancel={handleCameraCancel}
           />
         </div>
         <div className="flex-1">
-          <LightingControl 
+          <LightingControl
             settings={currentSettings.lighting}
             onApply={handleLightingApply}
             onCancel={handleLightingCancel}

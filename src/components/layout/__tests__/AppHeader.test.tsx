@@ -15,17 +15,38 @@ import type { MenuTree } from '@/types/menu';
 // usePathname 모킹
 const mockUsePathname = vi.fn(() => '/dashboard');
 
-vi.mock('next/navigation', async () => {
-  const actual = await vi.importActual('next/navigation');
-  return {
-    ...actual,
-    usePathname: () => mockUsePathname(),
-  };
-});
+vi.mock("@/hooks/menu/useNavMenuTitle", () => ({
+  useNavMenuTitle: () => (menu: { title: string }) => menu.title,
+}));
 
-// UserMenu 모킹 (useUserStore 의존성 제거)
-vi.mock('../Header/UserMenu', () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div data-testid="user-menu">{children}</div>,
+vi.mock("@/i18n/navigation", () => ({
+  usePathname: () => mockUsePathname(),
+  Link: ({
+    children,
+    href,
+    ...props
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+vi.mock("../Header/ProfileMenu", () => ({
+  default: () => (
+    <div data-testid="profile-menu">
+      <button type="button" aria-label="user menu">
+        profile
+      </button>
+    </div>
+  ),
+}));
+
+vi.mock("../Header/LocaleMenu", () => ({
+  default: () => <div data-testid="locale-menu" />,
 }));
 
 describe('AppHeader', () => {
@@ -33,6 +54,7 @@ describe('AppHeader', () => {
     {
       id: 1,
       title: 'Dashboard',
+      titleKey: 'NavMenu.dashboard',
       path: '/dashboard',
       icon: 'Dashboard',
       order: 1,
@@ -45,6 +67,7 @@ describe('AppHeader', () => {
     {
       id: 2,
       title: 'Settings',
+      titleKey: 'NavMenu.settings',
       path: null,
       icon: 'Settings',
       order: 2,
@@ -56,6 +79,7 @@ describe('AppHeader', () => {
         {
           id: 3,
           title: 'User Settings',
+          titleKey: 'NavMenu.settings',
           path: '/settings/user',
           icon: null,
           order: 1,
@@ -142,18 +166,25 @@ describe('AppHeader', () => {
   });
 
   /**
-   * AppHeader가 UserMenu를 렌더링하는지 테스트
+   * AppHeader가 ProfileMenu를 렌더링하는지 테스트
    */
-  it('should render UserMenu', () => {
+  it("should render ProfileMenu", () => {
     render(
       <SidebarProvider>
         <AppHeader menus={mockMenus} />
       </SidebarProvider>
     );
-    const userMenu = screen.getByTestId('user-menu');
-    expect(userMenu).toBeDefined();
-    const userMenuButton = screen.getByLabelText('user menu');
-    expect(userMenuButton).toBeDefined();
+    expect(screen.getByTestId("profile-menu")).toBeDefined();
+    expect(screen.getByLabelText("user menu")).toBeDefined();
+  });
+
+  it("should render LocaleMenu", () => {
+    render(
+      <SidebarProvider>
+        <AppHeader menus={mockMenus} />
+      </SidebarProvider>
+    );
+    expect(screen.getByTestId("locale-menu")).toBeDefined();
   });
 
   /**

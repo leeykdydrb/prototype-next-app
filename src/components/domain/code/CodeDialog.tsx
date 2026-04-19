@@ -5,7 +5,8 @@ import { Button, FormField, FormGroup,FormSection,Input, Label, Switch, Textarea
 import { Dialog, DialogContent, DialogBody, DialogFooter, DialogHeader } from "@/components/framework/layout";
 import { Alert } from "@/components/framework/feedback";
 import type { CodeDialogProps, CodeData, CodeInput } from "@/types/code";
-import { MESSAGES } from "@/constants/code";
+import { showError } from "@/lib/toast";
+import { useTranslations } from "next-intl";
 
 // 초기 폼 데이터 생성 함수
 const getInitialFormData = (code: CodeData | null, selectedGroupId: number): CodeInput => {
@@ -39,6 +40,9 @@ const isFormValid = (form: CodeInput) => {
 };
 
 export default function CodeDialog({ open, onClose, onSubmit, code, selectedGroupId }: CodeDialogProps) {
+  const t = useTranslations("AdminCodes.dialogs.code");
+  const tToast = useTranslations("AdminCodes.toast");
+  const tActions = useTranslations("AdminCodes.actions");
   const [formData, setFormData] = useState<CodeInput>(() => getInitialFormData(null, 0));
   const [editingCode, setEditingCode] = useState<CodeData | null>(null);
   const isValid = useMemo(() => isFormValid(formData), [formData]);
@@ -65,7 +69,7 @@ export default function CodeDialog({ open, onClose, onSubmit, code, selectedGrou
 
   const handleSubmit = useCallback(() => {
     if (!isValid) {
-      alert(MESSAGES.REQUIRED_FIELDS);
+      showError(tToast("requiredFields"));
       return;
     }
     onSubmit({
@@ -74,51 +78,51 @@ export default function CodeDialog({ open, onClose, onSubmit, code, selectedGrou
       codeName: formData.codeName.trim(),
       description: formData.description?.trim() || null,
     });
-  }, [isValid, formData, onSubmit]);
+  }, [isValid, formData, onSubmit, tToast]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent size="xl">
         <DialogHeader
-          title={editingCode ? "코드 수정" : "코드 추가"}
-          description="코드 정보를 입력하세요. 필수 항목은 코드와 코드명입니다."
+          title={editingCode ? t("titleEdit") : t("titleCreate")}
+          description={t("description")}
         />
         <DialogBody>
           {code?.isSystem && (
             <Alert variant="warning" className="mb-4">
-              시스템 코드는 수정할 수 없습니다.
+              {t("systemEditWarning")}
             </Alert>
           )}
           <FormSection>
             <FormGroup columns={2} className="pb-0">
               <FormField>
-                <Label htmlFor="code" required>코드</Label>
+                <Label htmlFor="code" required>{t("fields.code")}</Label>
                 <Input
                   id="code"
                   value={formData.code}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("code")(e.target.value)}
                   disabled={editingCode?.code ? true : false}
-                  placeholder="예: ADMIN"
+                  placeholder={t("fields.codePlaceholder")}
                   className="uppercase"
                   required={formData.code.trim() === ''}
                   autoFocus={!editingCode}
                 />
               </FormField>
               <FormField>
-                <Label htmlFor="codeName" required>코드명</Label>
+                <Label htmlFor="codeName" required>{t("fields.codeName")}</Label>
                 <Input
                   id="codeName"
                   value={formData.codeName}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange("codeName")(e.target.value)}
                   disabled={code?.isSystem}
-                  placeholder="예: 관리자"
+                  placeholder={t("fields.codeNamePlaceholder")}
                   required={formData.codeName.trim() === ''}
                 />
               </FormField>
             </FormGroup>
             <FormGroup columns={2} className="pb-0">
               <FormField>
-                <Label htmlFor="sortOrder">정렬 순서</Label>
+                <Label htmlFor="sortOrder">{t("fields.sortOrder")}</Label>
                 <Input
                   id="sortOrder"
                   type="number"
@@ -132,13 +136,13 @@ export default function CodeDialog({ open, onClose, onSubmit, code, selectedGrou
             </FormGroup>
             <FormGroup className="pb-0">
               <FormField>
-                <Label htmlFor="description">설명</Label>
+                <Label htmlFor="description">{t("fields.description")}</Label>
                 <Textarea
                   id="description"
                   value={formData.description || ""}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleChange("description")(e.target.value)}
                   disabled={code?.isSystem}
-                  placeholder="코드에 대한 설명을 입력하세요"
+                  placeholder={t("fields.descriptionPlaceholder")}
                 />
               </FormField>
             </FormGroup>
@@ -149,7 +153,7 @@ export default function CodeDialog({ open, onClose, onSubmit, code, selectedGrou
                   checked={formData.isActive}
                   onCheckedChange={(checked) => handleChange("isActive")(checked)}
                   disabled={code?.isSystem}
-                  label="활성화"
+                  label={t("fields.isActiveLabel")}
                 />
               </FormField>
             </FormGroup>
@@ -158,10 +162,10 @@ export default function CodeDialog({ open, onClose, onSubmit, code, selectedGrou
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            취소
+            {tActions("cancel")}
           </Button>
           <Button onClick={handleSubmit} disabled={!isValid}>
-            {editingCode ? "수정" : "추가"}
+            {editingCode ? tActions("edit") : tActions("add")}
           </Button>
         </DialogFooter>
       </DialogContent>

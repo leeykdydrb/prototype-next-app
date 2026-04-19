@@ -1,12 +1,12 @@
 'use client'
 
 import React, { useMemo } from "react";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/navigation";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, SidebarTrigger } from "@/components/framework/layout";
 import { Separator } from "@/components/framework/data-display";
-import { Button } from "@/components/framework/form";
-import { User as UserIcon } from "lucide-react";
-import UserMenu from "./UserMenu";
+import { useNavMenuTitle } from "@/hooks/menu/useNavMenuTitle";
+import LocaleMenu from "./LocaleMenu";
+import ProfileMenu from "./ProfileMenu";
 import type { MenuTree } from "@/types/menu";
 
 interface HeaderProps {
@@ -16,6 +16,7 @@ interface HeaderProps {
 
 export default function AppHeader({ title = 'PROTOTYPE SYSTEM', menus }: HeaderProps) {
   const pathname = usePathname();
+  const navTitle = useNavMenuTitle();
 
   // 현재 경로에 맞는 Breadcrumb 항목들 생성
   const breadcrumbItems = useMemo(() => {
@@ -55,7 +56,7 @@ export default function AppHeader({ title = 'PROTOTYPE SYSTEM', menus }: HeaderP
         }
         
         return {
-          title: menu.title,
+          title: navTitle(menu),
           path: linkPath,
           isLast: index === menuPath.length - 1
         };
@@ -63,7 +64,7 @@ export default function AppHeader({ title = 'PROTOTYPE SYSTEM', menus }: HeaderP
     ];
 
     return breadcrumbItems;
-  }, [menus, pathname, title]);
+  }, [menus, pathname, title, navTitle]);
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
@@ -77,8 +78,8 @@ export default function AppHeader({ title = 'PROTOTYPE SYSTEM', menus }: HeaderP
                 {item.isLast ? (
                   <BreadcrumbPage>{item.title}</BreadcrumbPage>
                 ) : item.path ? (
-                  <BreadcrumbLink href={item.path}>
-                    {item.title}
+                  <BreadcrumbLink asChild>
+                    <Link href={item.path}>{item.title}</Link>
                   </BreadcrumbLink>
                 ) : (
                   <span className="text-muted-foreground">{item.title}</span>
@@ -94,12 +95,8 @@ export default function AppHeader({ title = 'PROTOTYPE SYSTEM', menus }: HeaderP
       
       {/* 우측 액션 버튼들 */}
       <div className="ml-auto flex items-center gap-2">
-        {/* 사용자 메뉴 */}
-        <UserMenu>
-          <Button variant="ghost" size="icon" aria-label="user menu">
-            <UserIcon className="h-4 w-4" />
-          </Button>
-        </UserMenu>
+        <LocaleMenu />
+        <ProfileMenu />
       </div>
     </header>
   )

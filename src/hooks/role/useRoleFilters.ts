@@ -1,13 +1,40 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import type { RoleSearchFilters } from '@/types/role';
+import type { FilterField } from '@/components/common/SearchFilter';
 
 export const useRoleFilters = () => {
+  const tf = useTranslations('AdminRoles.filters');
+
   const [filters, setFilters] = useState<RoleSearchFilters>({
     search: '',
     isActive: 'all'
   });
   const [page, setPage] = useState(0); // 페이지 번호
   const [rowsPerPage, setRowsPerPage] = useState(10); // 페이지당 표시할 권한 수
+
+  const filterFields = useMemo(
+    () =>
+      [
+        {
+          type: 'search' as const,
+          key: 'search' as const,
+          id: 'role-search',
+          placeholder: tf('searchPlaceholder'),
+        },
+        {
+          type: 'select' as const,
+          key: 'isActive' as const,
+          label: tf('status'),
+          options: [
+            { value: 'all', label: tf('all') },
+            { value: 'true', label: tf('active') },
+            { value: 'false', label: tf('inactive') },
+          ],
+        },
+      ] satisfies FilterField<RoleSearchFilters>[],
+    [tf],
+  );
 
   const searchParams = useMemo(() => ({
     ...(filters.search && { search: filters.search }),
@@ -37,6 +64,7 @@ export const useRoleFilters = () => {
 
   return {
     filters,
+    filterFields,
     page,
     rowsPerPage,
     searchParams,

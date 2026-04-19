@@ -4,15 +4,18 @@ import { useParams } from 'next/navigation';
 import { useEquipmentQuery } from "@/hooks/equipment/useEquipmentQuery";
 import Loading from "@/components/common/Loading";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { useTranslations } from "next-intl";
 
 export default function EquipmentDetailForm() {
+  const t = useTranslations("Equipment.detail");
+  const tFields = useTranslations("Equipment.detail.fields");
   const params = useParams();
   const id = params?.id as string;
 
   const { data: equipment, isLoading, error } = useEquipmentQuery(id);
 
   if (isLoading) {
-    return <Loading message="설비 정보를 불러오는 중입니다..." />;
+    return <Loading message={t("loading")} />;
   }
 
   if (error) {
@@ -20,17 +23,17 @@ export default function EquipmentDetailForm() {
   }
 
   if (!equipment) {
-    return <div>설비를 찾을 수 없습니다.</div>;
+    return <div>{t("notFound")}</div>;
   }
 
   return (
     <div className="w-full">
-        <h1>설비 상세페이지</h1>
+        <h1>{t("title")}</h1>
         <div className="flex flex-col gap-2">
-            <p>설비 ID: {equipment.id}</p>
-            <p>설비 이름: {equipment.name}</p>
-            <p>설비 위치: {equipment.location}</p>
-            <p>가동 상태: {equipment.isActive ? "가동 중" : "정지"}</p>
+            <p>{tFields("id")}: {equipment.id}</p>
+            <p>{tFields("name")}: {equipment.name}</p>
+            <p>{tFields("location")}: {equipment.location}</p>
+            <p>{tFields("status")}: {equipment.isActive ? tFields("active") : tFields("inactive")}</p>
         </div>
     </div>
   );
