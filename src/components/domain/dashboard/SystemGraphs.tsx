@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { CardComponents } from '@/components/framework';
 import { Badge } from '@/components/framework/data-display';
@@ -9,41 +9,78 @@ import { SimpleLineChart, SimpleAreaChart, type ChartConfig } from '@/components
 
 type SeriesPoint = { name: string; value: number; value2: number };
 
-// 실시간 데이터 생성을 위한 훅
-function useRealtimeData(initialData: SeriesPoint[], maxPoints: number = 20) {
-  const [data, setData] = useState<SeriesPoint[]>(initialData);
+/** collector 게이트웨이가 보내는 스냅샷 형태 (프로젝트 간 타입 중복 허용) */
+type DashboardSnapshotPayload = {
+  collectedAt: string;
+  metrics: {
+    cpuTemp: { value: number; value2: number };
+    gpuTemp: { value: number; value2: number };
+    cpuUsage: { value: number; value2: number };
+    memoryUsage: { value: number; value2: number };
+    diskActivity: { value: number; value2: number };
+  };
+};
 
-  const generateRandomValue = useCallback(() => Math.floor(Math.random() * 101), []);
+type DashboardSeriesState = {
+  cpuTemp: SeriesPoint[];
+  gpuTemp: SeriesPoint[];
+  cpuUsage: SeriesPoint[];
+  memoryUsage: SeriesPoint[];
+  diskActivity: SeriesPoint[];
+};
 
-  const addNewDataPoint = useCallback(() => {
-    setData(prevData => {
-      const now = new Date();
-      const timeLabel = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
-      
-      const newPoint: SeriesPoint = {
-        name: timeLabel,
-        value: generateRandomValue(),
-        value2: generateRandomValue()
-      };
+const EMPTY_SERIES: DashboardSeriesState = {
+  cpuTemp: [],
+  gpuTemp: [],
+  cpuUsage: [],
+  memoryUsage: [],
+  diskActivity: [],
+};
 
-      // 기존 데이터에 새 포인트 추가
-      const newData = [...prevData, newPoint];
-      
-      // 최대 포인트 수를 초과하면 가장 오래된 데이터 제거 (슬라이딩 윈도우)
-      if (newData.length > maxPoints) {
-        return newData.slice(1);
-      }
-      
-      return newData;
-    });
-  }, [generateRandomValue, maxPoints]);
+function appendSeries(prev: SeriesPoint[], point: SeriesPoint, maxPoints: number): SeriesPoint[] {
+  const next = [...prev, point];
+  if (next.length > maxPoints) return next.slice(1);
+  return next;
+}
+
+function timeLabelFromIso(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+}
+
+/**
+ * SSE: collector 내부 SSE 게이트웨이로부터 데이터를 받아옵니다.
+ */
+function useDashboardSse(maxPoints: { temp: number; usage: number }): DashboardSeriesState {
+  const [series, setSeries] = useState<DashboardSeriesState>(EMPTY_SERIES);
 
   useEffect(() => {
-    const interval = setInterval(addNewDataPoint, 2000); // 2초마다 업데이트
-    return () => clearInterval(interval);
-  }, [addNewDataPoint]);
+    const es = new EventSource('/api/stream');
 
-  return data;
+    es.onmessage = (event) => {
+      const raw = JSON.parse(event.data) as
+        | { type?: string; snapshot?: DashboardSnapshotPayload; point?: SeriesPoint };
+
+      if (raw.type === 'dashboardSnapshot' && raw.snapshot?.metrics) {
+        const name = timeLabelFromIso(raw.snapshot.collectedAt);
+        const m = raw.snapshot.metrics;
+        setSeries((prev) => ({
+          cpuTemp: appendSeries(prev.cpuTemp, { name, value: m.cpuTemp.value, value2: m.cpuTemp.value2 }, maxPoints.temp),
+          gpuTemp: appendSeries(prev.gpuTemp, { name, value: m.gpuTemp.value, value2: m.gpuTemp.value2 }, maxPoints.temp),
+          cpuUsage: appendSeries(prev.cpuUsage, { name, value: m.cpuUsage.value, value2: m.cpuUsage.value2 }, maxPoints.usage),
+          memoryUsage: appendSeries(prev.memoryUsage, { name, value: m.memoryUsage.value, value2: m.memoryUsage.value2 }, maxPoints.usage),
+          diskActivity: appendSeries(prev.diskActivity, { name, value: m.diskActivity.value, value2: m.diskActivity.value2 }, maxPoints.usage),
+        }));
+        return;
+      }
+    };
+
+    return () => {
+      es.close();
+    };
+  }, [maxPoints.temp, maxPoints.usage]);
+
+  return series;
 }
 
 function TemperatureCard({
@@ -194,26 +231,7 @@ export default function SystemGraphs() {
     [tGraphs],
   );
 
-  // 초기 데이터 생성
-  const generateInitialData = (count: number = 10) => {
-    const now = new Date();
-    return Array.from({ length: count }, (_, i) => {
-      const time = new Date(now.getTime() - (count - 1 - i) * 2 * 1000); // 2초 간격
-      const timeLabel = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}`;
-      return {
-        name: timeLabel,
-        value: Math.floor(Math.random() * 101),
-        value2: Math.floor(Math.random() * 101)
-      };
-    });
-  };
-
-  // 실시간 데이터 훅 사용 (더 많은 포인트로 부드러운 흐름)
-  const cpuTemp = useRealtimeData(generateInitialData(15), 15);
-  const gpuTemp = useRealtimeData(generateInitialData(15), 15);
-  const cpuUsage = useRealtimeData(generateInitialData(15), 15);
-  const memoryUsage = useRealtimeData(generateInitialData(15), 15);
-  const diskUsage = useRealtimeData(generateInitialData(15), 15);
+  const sse = useDashboardSse({ temp: 15, usage: 8 });
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-1 lg:gap-1">
@@ -221,13 +239,13 @@ export default function SystemGraphs() {
       <div className="lg:col-span-8 space-y-2 min-w-0">
         <TemperatureCard
           title={tGraphs('cpuTemp')}
-          data={cpuTemp}
+          data={sse.cpuTemp}
           status={statusOk}
           chartConfig={chartConfig}
         />
         <TemperatureCard
           title={tGraphs('gpuTemp')}
-          data={gpuTemp}
+          data={sse.gpuTemp}
           status={statusOk}
           chartConfig={chartConfig}
         />
@@ -235,9 +253,9 @@ export default function SystemGraphs() {
 
       {/* Right column: Usage (area) */}
       <div className="lg:col-span-4 space-y-2 min-w-0">
-        <UsageCard title={tGraphs('cpuUsage')} data={cpuUsage} chartConfig={chartConfig} />
-        <UsageCard title={tGraphs('memoryUsage')} data={memoryUsage} chartConfig={chartConfig} />
-        <UsageCard title={tGraphs('diskUsage')} data={diskUsage} chartConfig={chartConfig} />
+        <UsageCard title={tGraphs('cpuUsage')} data={sse.cpuUsage} chartConfig={chartConfig} />
+        <UsageCard title={tGraphs('memoryUsage')} data={sse.memoryUsage} chartConfig={chartConfig} />
+        <UsageCard title={tGraphs('diskUsage')} data={sse.diskActivity} chartConfig={chartConfig} />
       </div>
     </div>
   );
